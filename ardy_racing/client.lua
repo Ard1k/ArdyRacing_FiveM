@@ -68,7 +68,7 @@ function SetCurrentState(state, race, forceReopen)
         currentRace.OriginalLaps = currentRace.Laps
         currentRace.EndTimerAfterFirst = 0
         currentRace.ValidateProgress = true
-        currentRace.AllowExitCar = false
+        currentRace.AllowExitCar = true
         currentRace.IsRanked = true
     end
 
@@ -599,7 +599,9 @@ Citizen.CreateThread(function()
                             RaceLapFinished(currentTime)
                             RaceFinished(currentTime)
 
-                            TriggerServerEvent('ardy_racing:RaceFinished', currentRace.EventUID, {totalTime = currentRace.TotalTime, bestLapTime = currentRace.BestLapTime, driftScore = currentRace.DriftScore, bestLapDrift = currentRace.BestDriftLap})
+                            local vehHash = GetEntityModel(vehicle)
+                            local vehDName = GetDisplayNameFromVehicleModel(vehHash)
+                            TriggerServerEvent('ardy_racing:RaceFinished', currentRace.EventUID, {totalTime = currentRace.TotalTime, bestLapTime = currentRace.BestLapTime, driftScore = currentRace.DriftScore, bestLapDrift = currentRace.BestDriftLap, vehData = {Hash = vehHash, Name = vehDName}})
                             SetCurrentState(STATE_AFTERRACE, currentRace, true)
                         else
                             local nextIndex = currentRace.CheckpointCurrent + 1
@@ -1132,8 +1134,7 @@ function OpenMenu()
                     if 
                         currentRace.AllowSlipstream == false and
                         (currentRace.Type ~= RACETYPE_CIRCUIT or currentRace.Laps == currentRace.OriginalLaps) and
-                        currentRace.ValidateProgress == true and
-                        currentRace.AllowExitCar == false
+                        currentRace.ValidateProgress == true
                     then
                         currentRace.IsRanked = true
                     else

@@ -103,11 +103,19 @@ function RenderMenu()
 
 			SetTextFont(4);
 
-			if CurrentMenu.Buttons[i].Name ~= nil then
+			if CurrentMenu.Buttons[i].Name ~= nil or CurrentMenu.Buttons[i].Active == true then
 				SetTextScale(0.34, 0.34)
 				SetTextColour(255, 255, 255, 255)
 				SetTextEntry("STRING")
-				AddTextComponentString(CurrentMenu.Buttons[i].Name)
+                local stringSelected = ''
+                local stringName = ''
+                if CurrentMenu.Buttons[i].Active then
+                    stringSelected = '> ' 
+				end
+                if CurrentMenu.Buttons[i].Name ~= nil then
+                    stringName = CurrentMenu.Buttons[i].Name
+                end
+                AddTextComponentString(stringSelected .. stringName)
 				DrawText(0.63, (yoffset + (0.03 * (i - 1 - indexMin + 0.01)) - 0.012))
             end
 

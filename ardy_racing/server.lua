@@ -21,7 +21,7 @@ function GetNextEventIdSafe()
     return newId
 end
 
-function ProcessLeaderboard(event, playerData, sourceCopy)
+function ProcessLeaderboard(event, playerData, sourceCopy, startVehicle, finisVehicle)
     Citizen.CreateThread(function() 
         local evt = event
         local pdat = playerData
@@ -36,8 +36,18 @@ function ProcessLeaderboard(event, playerData, sourceCopy)
             return
         end
 
-        if (pdat.VehicleData == nil) then
-            print('Aracing - ProcessLeaderboard - missing vehicle data')
+        if (startVehicle == nil or startVehicle.Hash == nil) then
+            print('Aracing - ProcessLeaderboard - missing start vehicle data')
+            return
+        end
+
+        if (finisVehicle == nil or finisVehicle.Hash == nil) then
+            print('Aracing - ProcessLeaderboard - missing finish vehicle data')
+            return
+        end
+
+        if startVehicle.Hash ~= finisVehicle.Hash then
+            NotifyPlayerError(src, 'Leaderboard skipped. Car model changed during race!')
             return
         end
 
@@ -503,13 +513,18 @@ AddEventHandler("ardy_racing:RaceFinished", function(eventUID, paramTbl)
         return
     end
 
+    local startVeh = foundPlayer.VehicleData
+    if paramTbl.vehData ~= nil then
+        foundPlayer.VehicleData = paramTbl.vehData
+    end
+
     foundPlayer.HasFinished = true
     foundPlayer.TotalTime = paramTbl.totalTime
     foundPlayer.BestLapTime = paramTbl.bestLapTime
     foundPlayer.DriftScore = paramTbl.driftScore
     foundPlayer.BestLapDrift = paramTbl.bestLapDrift
     
-    ProcessLeaderboard(foundEvent, foundPlayer, src)
+    ProcessLeaderboard(foundEvent, foundPlayer, src, startVeh, paramTbl.vehData)
 
     SortEventPlayers(foundEvent)
     TriggerClientEvent('ardy_racing:PlayerFinishedEvent', -1, foundEvent.EventUID, foundPlayer, foundEvent.Players)
