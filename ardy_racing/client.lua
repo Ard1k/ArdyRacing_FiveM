@@ -524,6 +524,7 @@ Citizen.CreateThread(function()
 
                     SetBlipRoute(currentRace.Checkpoints[currentRace.CheckpointCurrent + 1].blip, true)
                     SetBlipRouteColour(currentRace.Checkpoints[currentRace.CheckpointCurrent + 1].blip, Config.blip_color)
+                    CheckpointPassed()
 
                     local checkpointType = nil
                     local targetCheckpointCoords = {0,0,0}
@@ -587,11 +588,14 @@ Citizen.CreateThread(function()
                     end
 
                     local checkpointProximity = GetDistanceBetweenCoords(position.x, position.y, position.z, currentRace.Checkpoints[currentRace.CheckpointCurrent].coords.x, currentRace.Checkpoints[currentRace.CheckpointCurrent].coords.y, currentRace.Checkpoints[currentRace.CheckpointCurrent].coords.z, false)
+                    UpdateCheckpointDistance(checkpointProximity)
                     currentRace.CheckpointProximity = checkpointProximity
-                    if checkpointProximity < Config.checkpoint_radius then                        
+                    if checkpointProximity < (Config.checkpoint_radius / 2) * 1.2 then                        
                         if currentRace.Checkpoints[currentRace.CheckpointCurrent].checkpoint ~= nil then
                             DeleteCheckpoint(currentRace.Checkpoints[currentRace.CheckpointCurrent].checkpoint)
                         end
+
+                        CheckpointPassed()
                         
                         if (currentRace.CheckpointCurrent == #currentRace.Checkpoints and currentRace.CurrentLap == nil) or (currentRace.CheckpointCurrent == 1 and currentRace.CurrentLap ~= nil and currentRace.CurrentLap == currentRace.Laps) then
                             PlaySoundFrontend(-1, "ScreenFlash", "WastedSounds")
@@ -787,9 +791,13 @@ end)
 
 function OpenMenu()
     if currentState == STATE_INSPECT then
-        currentState = STATE_NONE
-        SetWaypointOff()
-        SetCurrentRace(nil)
+        if exports.ardy_easymenu:ToggleMenuVisible(GetCurrentResourceName()) == true then
+            return
+        else
+            currentState = STATE_NONE
+            SetWaypointOff()
+            SetCurrentRace(nil)
+        end
     end
 
     if currentState == STATE_NONE then

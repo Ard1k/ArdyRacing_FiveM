@@ -1,10 +1,14 @@
 local driftTotalScore = 0.0
 local angle = 0.0
+local angleFactor = 0.0
 local speed = 0.0
+local speedFactor = 0.0
 drift = {}
 driftTyre = false
 local lastVeh = nil
 driftEnabled = GetResourceKvpInt('cnf_driftEnabled') == 1
+checkpointDistance = 0.0
+checkpointMinDistance = math.huge
 
 
 
@@ -21,6 +25,18 @@ function ResetDrift()
 end
 
 ResetDrift()
+
+function UpdateCheckpointDistance(newDist)
+    if checkpointMinDistance > newDist then
+        checkpointMinDistance = newDist
+    end
+
+    checkpointDistance = newDist
+end
+
+function CheckpointPassed()
+    checkpointMinDistance = math.huge
+end
 
 function DriftFinished()
     if drift.duration < Config.drift_min_duration then
@@ -88,6 +104,9 @@ Citizen.CreateThread(function()
             if debugMode then
                 exports.ardy_utils:Draw2DText(Config.debug_x, Config.debug_y + 0.02, 'Score: ' .. string.format("%.0f", driftTotalScore), 0.3, false, 255, 255, 255)
                 exports.ardy_utils:Draw2DText(Config.debug_x, Config.debug_y + 0.04, 'DriftTires: ' .. GetBoolTextDriftTyres(driftTyre), 0.3, false, 255, 255, 255)
+                exports.ardy_utils:Draw2DText(Config.debug_x, Config.debug_y + 0.20, 'Angle: ' .. string.format("%.0f", angle), 0.3, false, 255, 255, 255)
+                exports.ardy_utils:Draw2DText(Config.debug_x, Config.debug_y + 0.22, 'Speed: ' .. string.format("%.0f", speed), 0.3, false, 255, 255, 255)
+                exports.ardy_utils:Draw2DText(Config.debug_x, Config.debug_y + 0.24, 'Checkpoint dist: ' .. string.format("%.0f", checkpointDistance), 0.3, false, 255, 255, 255)
             end
         end
     end
@@ -128,8 +147,18 @@ Citizen.CreateThread(function()
                     DrawLine(vehPos.x, vehPos.y, vehPos.z + 1.1, vehPos.x + movementVector.x, vehPos.y + movementVector.y, vehPos.z + 1.1, 0, 255, 0, 255)
                 end
 
+                if currentRace ~= nil and currentState == STATE_RACING and (checkpointDistance - checkpointMinDistance) > Config.drift_max_reverse_dist then 
+                    currentRace.DriftScore = 0
+                    ResetDrift()
+                    DriftResultText('DONT CHEAT', 255, 200, 0)
+                end
+
                 speed = GetEntitySpeed(veh)
+                speedFactor = speed
+                if speedFactor > Config.drift_speed_cap then speedFactor = Config.drift_speed_cap end
                 angle = math.acos((fwdVector.x * movementVector.x + fwdVector.y * movementVector.y) / (math.sqrt(fwdVector.x^2+fwdVector.y^2) * math.sqrt(movementVector.x^2+movementVector.y^2))) * 180/math.pi
+                angleFactor = angle
+                if angleFactor > Config.drift_angle_max then angleFactor = Config.drift_angle_max end
 
                 local isDrifting = speed > Config.drift_min_speed and angle > Config.drift_angle_min
 
@@ -141,12 +170,13 @@ Citizen.CreateThread(function()
                     end
                 else
                     drift.nodriftduration = 0
-                    drift.multipler = 1 + math.floor(drift.duration/1000) * 0.2
-                    drift.points = drift.points + (angle * Config.drift_angle_effect_mult * (frameTime / 1))
+                    if drift.multipler == nil or drift.multipler < Config.drift_multipler_cap then drift.multipler = 1 + math.floor(drift.duration/1000) * 0.2
+                    elseif drift.multipler > Config.drift_multipler_cap then drift.multipler = Config.drift_multipler_cap end
+                    drift.points = drift.points + ((angleFactor * (speedFactor/Config.drift_speed_cap) + (speedFactor * Config.drift_effect_speedfactor)) * Config.drift_effect_mult * (frameTime / 1))
                     drift.duration = drift.duration + frameTime
                 end
 
-                local isOverturn = angle > Config.drift_angle_max
+                local isOverturn = angle > Config.drift_overturn_angle
                 if isOverturn and drift.duration > Config.drift_min_duration then
                     DriftFailed('OVERTURN')
                 end

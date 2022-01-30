@@ -5,11 +5,16 @@ Config = {
     enable_car_specific_leaderboard_notif = false,
 
     drift_angle_min = 8,
-    drift_angle_max = 90,
+    drift_angle_max = 35,
     drift_end_after_ms = 1000,
     drift_min_speed = 6,
-    drift_angle_effect_mult = 20.0,
+    drift_effect_mult = 30.0,
+    drift_effect_speedfactor = 0.5,
     drift_min_duration = 500,
+    drift_speed_cap = 20.0,
+    drift_multipler_cap = 5.0,
+    drift_overturn_angle = 90,
+    drift_max_reverse_dist = 15,
 
     blip_color = 5,
     blip_passed_color = 2,
