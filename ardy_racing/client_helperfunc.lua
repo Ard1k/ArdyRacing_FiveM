@@ -49,6 +49,14 @@ function GetBoolYesNoText(boolVar)
     end
 end
 
+function GetBoolYesNoTextInverted(boolVar)
+    if boolVar ~= true then -- Nil returns yes, this saves mi some logic outside
+        return 'YES'
+    else
+        return 'NO'
+    end
+end
+
 function GetLapsString(laps)
     if laps == nil then
         return 'N/A'

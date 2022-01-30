@@ -201,8 +201,16 @@ AddEventHandler("ardy_racing:SetRaceUnlisted", function(isUnlisted, race)
 
     local ret = SetRaceUnlisted(race.Name, isUnlisted)
 
+    local serverRace = GetRaceByName(race.Name)
+
+    if serverRace.AuthorUID ~= GetPlayerUID(src) then
+        DataLocked = false
+        NotifyPlayerError(src, 'You are not author of this race')
+        return
+    end
+
     if ret == false then
-        NotifyPlayerError(src, 'Unable to set unlisted status')
+        NotifyPlayerError(src, 'Unable to set listed status')
         return
     end
 

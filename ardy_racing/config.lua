@@ -14,7 +14,7 @@ Config = {
     drift_speed_cap = 20.0,
     drift_multipler_cap = 5.0,
     drift_overturn_angle = 90,
-    drift_max_reverse_dist = 15,
+    drift_max_reverse_dist = 10,
 
     blip_color = 5,
     blip_passed_color = 2,

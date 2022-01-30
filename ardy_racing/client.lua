@@ -351,7 +351,7 @@ AddEventHandler("ardy_racing:RaceUnlistedSet", function(raceName, isUnlisted)
         CallRefresh()
     end 
     
-    exports.ardy_utils:NotifySuccess('Unlisted status updated!')
+    exports.ardy_utils:NotifySuccess('Listed status updated!')
 end)
 
 RegisterNetEvent("ardy_racing:OpenRaceLeaderboards")
@@ -964,17 +964,17 @@ function OpenMenu()
                     buttonRef.NameRight = GetRaceTypeText(currentRace.Type) 
                     return buttonRef
                 end},
-                {Name = 'Unlisted', NameRight = GetBoolYesNoText(currentRace.IsUnlisted), FuncOnSelected = function(buttonRef)
+                {Name = 'Listed publicly', NameRight = GetBoolYesNoTextInverted(currentRace.IsUnlisted), FuncOnSelected = function(buttonRef)
                     if currentRace.IsUnlisted == nil then
                         currentRace.IsUnlisted = false
                     end
                     currentRace.IsUnlisted = not currentRace.IsUnlisted
 
                     CallRefresh()
-                    buttonRef.NameRight = GetBoolYesNoText(currentRace.IsUnlisted)
+                    buttonRef.NameRight = GetBoolYesNoTextInverted(currentRace.IsUnlisted)
                     return buttonRef 
                 end, FuncRefresh = function(buttonRef)
-                    buttonRef.NameRight = GetBoolYesNoText(currentRace.IsUnlisted)
+                    buttonRef.NameRight = GetBoolYesNoTextInverted(currentRace.IsUnlisted)
                     return buttonRef
                 end},
                 {Name = 'Laps', NameRight = GetLapsString(currentRace.Laps), IsTextInput = true, TextInputRequest = 'Enter laps count', TextInputMaxLen = 2, FuncOnTextInput = function(input)
@@ -1276,6 +1276,35 @@ function OpenMenu()
                 {Name = 'Leaderboards enabled', NameRight = GetBoolYesNoText(currentRace.IsRanked)}
             }
         }
+
+        if currentRace.Type == RACETYPE_DRIFT or currentRace.Type == RACETYPE_DRIFTCIRCUIT then
+            table.insert(menu.Buttons, 3, {Name = 'Car drift tires', NameRight = GetBoolTextDriftTyres(driftTyre), FuncOnSelected = function(buttonRef) 
+                if gameBuild >= 2189 then
+                    if Config.enable_drift_tire_manipultion == true then 
+                        local player = GetPlayerPed(-1)
+                        
+                        if IsPedInAnyVehicle(player, false) then
+                            local veh = GetVehiclePedIsIn(player, false)
+                            driftTyre = GetDriftTyresEnabledSafe(veh)
+    
+                            driftTyre = not driftTyre
+                            SetDriftTyresEnabled(veh, driftTyre)
+                        end
+    
+                        buttonRef.NameRight = GetBoolTextDriftTyres(driftTyre) 
+                        return buttonRef
+                    else
+                        exports.ardy_utils:NotifyError('Server admin has disabled this feature')
+                    end
+                else
+                    exports.ardy_utils:NotifyError('Server has unsupported build')
+                end
+            end,
+            FuncRefresh = function(buttonRef)
+                buttonRef.NameRight = GetBoolTextDriftTyres(driftTyre) 
+                return buttonRef
+            end})
+        end
     elseif currentState == STATE_RACING then
         menu = 
         {
@@ -1435,18 +1464,18 @@ function GenerateInspectSubMenu(race)
                 {Name = 'Race type', NameRight = GetRaceTypeText(race.Type)},
                 {Name = 'Checkpoint count', NameRight = tostring(#race.Checkpoints)},
                 {Name = 'Laps', NameRight = GetLapsString(race.Laps)},
-                {Name = 'Unlisted [Editable]', NameRight = GetBoolYesNoText(race.IsUnlisted), FuncOnSelected = function(buttonRef)
+                {Name = 'Listed publicly [Editable]', NameRight = GetBoolYesNoTextInverted(race.IsUnlisted), FuncOnSelected = function(buttonRef)
                     if currentRace ~= nil then
                         if currentRace.IsUnlisted == nil then
                             currentRace.IsUnlisted = false
                         end
                         TriggerServerEvent("ardy_racing:SetRaceUnlisted", not currentRace.IsUnlisted == true, currentRace)
-                        buttonRef.NameRight = GetBoolYesNoText(currentRace.IsUnlisted) --currentRace... sketchy but should work
+                        buttonRef.NameRight = GetBoolYesNoTextInverted(currentRace.IsUnlisted) --currentRace... sketchy but should work
                     end
                     return buttonRef 
                 end, FuncRefresh = function(buttonRef)
                     if currentRace ~= nil then
-                        buttonRef.NameRight = GetBoolYesNoText(currentRace.IsUnlisted)
+                        buttonRef.NameRight = GetBoolYesNoTextInverted(currentRace.IsUnlisted)
                     end
                     return buttonRef
                 end},
