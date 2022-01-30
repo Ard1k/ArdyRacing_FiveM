@@ -891,11 +891,20 @@ function OpenMenu()
                         {Name = 'Back', IsBack = true}
                     }
                 }},
+                {Name = 'About', SubMenu = {
+                    MenuTitle = 'About',
+                    Buttons = {
+                        {Name = 'Back', IsBack = true},
+                        {Name = ' ', IsUnselectable = true},
+                        {Name = 'Version', NameRight = '1.0' },
+                        {Name = 'Author', NameRight = 'Ardy'}
+                    }
+                }},
                 {Name = 'Close', IsBack = true},
             }
         }
 
-        local settingsButtons = menu.Buttons[#menu.Buttons - 1].SubMenu.Buttons
+        local settingsButtons = menu.Buttons[#menu.Buttons - 2].SubMenu.Buttons
         if isAdmin == false then
             table.insert(settingsButtons, #settingsButtons, {Name = 'Admin login', IsTextInput = true, TextInputRequest = 'Enter password', TextInputMaxLen = 30, FuncOnTextInput = function(input)
                 input = input:match'^%s*(.*%S)' or ''

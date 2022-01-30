@@ -21,9 +21,9 @@ Features:
   - During event creation is validated and displayed if the result will be eligible to rank in leaderboards (eg. slipstream off)
   - If top20 rank in global leaderboard of verified race is reached by a player, notification will be sent to other players
 - Drift race modes
-  - This catecogry is still work in progress - big thing to solve is preventing player doing donuts for 20min and then finishing race
-  - Score is awarded based on drift angle and score multiplier increases for drift duration - parameters customizable in config
+  - Score is awarded based on drift angle + speed and score multiplier increases for drift duration - parameters customizable in config
   - Win condition for drift sprint is the amount of points obtained through the whole race. For drift circuit best lap wins.
+  - If player wants to cheat and drives away from next checkpoint the score resets
 - Tools and settings
   - Players can block out of race notifications (new records, new events created, etc.)
   - Players can set drift tire physics for car - introduced in tuners update. Possible to disable in config
