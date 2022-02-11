@@ -1,5 +1,5 @@
 Config = {
-    max_menuitems_count = 14,
+    max_menuitems_count = 18,
 
     nav_up_key = 27,
     nav_down_key = 173,

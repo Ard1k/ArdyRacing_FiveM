@@ -14,6 +14,14 @@ isCountdownFrozen = false
 notificationsBlocked = GetResourceKvpInt('cnf_notificationsBlocked') == 1
 debugMode = GetResourceKvpInt('cnf_debugMode') == 1
 
+menuDefaultSprite =
+{
+    TextureDict = 'menu_textures',
+    TextureName = 'logo',
+    X = 1200.0,
+    Y = 548.0
+}
+
 function SetCurrentRace(race)
     SetWaypointOff()
     SetEnableVehicleSlipstreaming(false)
@@ -365,6 +373,7 @@ AddEventHandler("ardy_racing:OpenRaceLeaderboards", function(raceName, raceType,
     menu = 
     {
         MenuTitle = 'Leaderboards', --  [' .. raceName .. ']',
+        Sprite = menuDefaultSprite,
         Buttons = {}
     }
 
@@ -373,6 +382,7 @@ AddEventHandler("ardy_racing:OpenRaceLeaderboards", function(raceName, raceType,
 
         local submenu = {
             MenuTitle = 'GLOBAL',
+            Sprite = menuDefaultSprite,
             Buttons = {}
         }
 
@@ -414,6 +424,7 @@ AddEventHandler("ardy_racing:OpenRaceLeaderboards", function(raceName, raceType,
 
             local submenu = {
                 MenuTitle = carName,
+                Sprite = menuDefaultSprite,
                 Buttons = {}
             }
 
@@ -803,7 +814,8 @@ function OpenMenu()
     if currentState == STATE_NONE then
         menu = 
         {
-            MenuTitle = 'A-racing',
+            MenuTitle = 'Menu',
+            Sprite = menuDefaultSprite,
             Buttons = 
             {
                 {Name = 'Joinable events', FuncOnSelected = function()
@@ -830,6 +842,7 @@ function OpenMenu()
                 end},
                 {Name = 'Settings and Tools', SubMenu = {
                     MenuTitle = 'Settings and Tools',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'Car drift tires', NameRight = GetBoolTextDriftTyres(driftTyre), FuncOnSelected = function(buttonRef) 
                             if gameBuild >= 2189 then
@@ -893,10 +906,11 @@ function OpenMenu()
                 }},
                 {Name = 'About', SubMenu = {
                     MenuTitle = 'About',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'Back', IsBack = true},
                         {Name = ' ', IsUnselectable = true},
-                        {Name = 'Version', NameRight = '1.0' },
+                        {Name = 'Version', NameRight = '1.1' },
                         {Name = 'Author', NameRight = 'Ardy'}
                     }
                 }},
@@ -940,6 +954,7 @@ function OpenMenu()
         menu = 
         {
             MenuTitle = 'Editor',
+            Sprite = menuDefaultSprite,
             Buttons = 
             {
                 {Name = 'Race name', ExtraLeft = currentRace.Name, IsTextInput = true, TextInputRequest = 'Enter name', TextInputPrefill = 'ExtraLeft', TextInputMaxLen = 30, FuncOnTextInput = function(input)
@@ -951,6 +966,7 @@ function OpenMenu()
                 end},
                 {Name = 'Race type', NameRight = GetRaceTypeText(currentRace.Type), SubMenu = {
                     MenuTitle = 'Set race type',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = GetRaceTypeText(RACETYPE_SPRINT), IsBack = true, FuncOnSelected = function() 
                             currentRace.Type = RACETYPE_SPRINT
@@ -1043,6 +1059,7 @@ function OpenMenu()
                 {Name = ' ', IsUnselectable = true},
                 {Name = 'Save race', SubMenu = {
                     MenuTitle = 'Finish and save race?',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'No', IsBack = true},
                         {Name = 'Yes', FuncOnSelected = function()
@@ -1052,6 +1069,7 @@ function OpenMenu()
                 }},
                 {Name = 'Discard race', SubMenu = {
                     MenuTitle = 'Discard all changes?',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'No', IsBack = true},
                         {Name = 'Yes', FuncOnSelected = function()
@@ -1065,6 +1083,7 @@ function OpenMenu()
         menu = 
         {
             MenuTitle = 'Race setup',
+            Sprite = menuDefaultSprite,
             Buttons = 
             {
                 {Name = 'Public event', NameRight = GetBoolYesNoText(currentRace.IsPublic), FuncOnSelected = function(buttonRef)
@@ -1164,6 +1183,7 @@ function OpenMenu()
                 {Name = ' ', IsUnselectable = true},
                 {Name = 'Create event', SubMenu = {
                     MenuTitle = 'Confirm event setup?',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'No', IsBack = true},
                         {Name = 'Yes', FuncOnSelected = function()
@@ -1173,6 +1193,7 @@ function OpenMenu()
                 }},
                 {Name = 'Cancel', SubMenu = {
                     MenuTitle = 'Cancel race setup?',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'No', IsBack = true},
                         {Name = 'Yes', FuncOnSelected = function()
@@ -1191,6 +1212,7 @@ function OpenMenu()
         menu = 
         {
             MenuTitle = 'Race event',
+            Sprite = menuDefaultSprite,
             Buttons = 
             {
                 {Name = 'Join event', ColorOverride = {200, 150, 0, 150, 100, 0}, FuncOnSelected = function()
@@ -1252,6 +1274,7 @@ function OpenMenu()
         menu = 
         {
             MenuTitle = 'Race event info',
+            Sprite = menuDefaultSprite,
             Buttons = 
             {
                 {Name = 'Joined!', ColorOverride = {0, 200, 0, 0, 150, 0}},
@@ -1261,6 +1284,7 @@ function OpenMenu()
                 {Name = 'Hide menu', IsHide = true},
                 {Name = 'Leave event', SubMenu = {
                     MenuTitle = 'Really leave event?',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'No', IsBack = true},
                         {Name = 'Yes', FuncOnSelected = function()
@@ -1318,11 +1342,13 @@ function OpenMenu()
         menu = 
         {
             MenuTitle = 'Race in progress',
+            Sprite = menuDefaultSprite,
             Buttons = 
             {
                 {Name = 'Hide menu', IsHide = true},
                 {Name = 'Leave event', SubMenu = {
                     MenuTitle = 'Really leave event?',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'No', IsBack = true},
                         {Name = 'Yes', FuncOnSelected = function()
@@ -1336,6 +1362,7 @@ function OpenMenu()
         menu = 
         {
             MenuTitle = 'Event recap',
+            Sprite = menuDefaultSprite,
             Buttons = 
             {
                 {Name = 'Race name', ExtraLeft = currentRace.Name},
@@ -1345,6 +1372,7 @@ function OpenMenu()
                 end},
                 {Name = 'Leave event', SubMenu = {
                     MenuTitle = 'Really leave event?',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'No', IsBack = true},
                         {Name = 'Yes', FuncOnSelected = function()
@@ -1370,6 +1398,7 @@ function OpenListMenu()
     menu = 
     {
         MenuTitle = raceListTitle,
+        Sprite = menuDefaultSprite,
         Buttons = {}
     }
 
@@ -1402,6 +1431,7 @@ function OpenListMenu()
                 authorSubmenus[race.AuthorName] = 
                 {
                     MenuTitle = race.AuthorName,
+                    Sprite = menuDefaultSprite,
                     Buttons = {{Name = 'Back', IsBack = true}}
                 }
             end
@@ -1412,6 +1442,7 @@ function OpenListMenu()
                 raceTypeSubmenus[raceTypeText] = 
                 {
                     MenuTitle = raceTypeText,
+                    Sprite = menuDefaultSprite,
                     Buttons = {{Name = 'Back', IsBack = true}}
                 }
             end
@@ -1421,6 +1452,7 @@ function OpenListMenu()
 
         local authorSubmenu = {
             MenuTitle = 'By author',
+            Sprite = menuDefaultSprite,
             Buttons = {{Name = 'Back', IsBack = true}}
         }
 
@@ -1430,6 +1462,7 @@ function OpenListMenu()
 
         local raceTypeSubmenu = {
             MenuTitle = 'By race type',
+            Sprite = menuDefaultSprite,
             Buttons = {{Name = 'Back', IsBack = true}}
         }
 
@@ -1451,6 +1484,7 @@ function GenerateInspectSubMenu(race)
     local menu = 
         {
             MenuTitle = 'Race details',
+            Sprite = menuDefaultSprite,
             Buttons = 
             {
                 {Name = 'Create event', FuncOnSelected = function() 
@@ -1491,6 +1525,7 @@ function GenerateInspectSubMenu(race)
                 {Name = ' ', IsUnselectable = true},
                 {Name = 'Delete Race', SubMenu = {
                     MenuTitle = 'Really delete this race?',
+                    Sprite = menuDefaultSprite,
                     Buttons = {
                         {Name = 'No', IsBack = true},
                         {Name = 'Yes', FuncOnSelected = function() TriggerServerEvent('ardy_racing:DeleteRace', race) end}
@@ -1541,6 +1576,7 @@ function AvailableEventsMenu()
     menu = 
     {
         MenuTitle = 'Starting events',
+        Sprite = menuDefaultSprite,
         Buttons = {}
     }
 
