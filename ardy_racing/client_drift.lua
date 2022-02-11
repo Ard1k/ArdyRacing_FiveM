@@ -70,6 +70,9 @@ end
 
 -- Drift tires refresh
 Citizen.CreateThread(function()
+    while gameBuild == nil do
+        Citizen.Wait(0)
+    end
     if gameBuild >= 2189 then
         while true do
             local player = GetPlayerPed(-1)

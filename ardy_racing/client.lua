@@ -13,6 +13,7 @@ isCountdownFrozen = false
 
 notificationsBlocked = GetResourceKvpInt('cnf_notificationsBlocked') == 1
 debugMode = GetResourceKvpInt('cnf_debugMode') == 1
+alwaysAllBlips = GetResourceKvpInt('cnf_alwaysAllBlips') == 1
 
 menuDefaultSprite =
 {
@@ -536,7 +537,12 @@ Citizen.CreateThread(function()
                         currentRace.CurrentLap = nil
                     end
 
-                    SetBlipColour(currentRace.Checkpoints[currentRace.CheckpointCurrent].blip, Config.blip_passed_color)
+                    if #currentRace.Checkpoints > 4 and not alwaysAllBlips then
+                        RemoveBlip(currentRace.Checkpoints[currentRace.CheckpointCurrent].blip)
+                        currentRace.Checkpoints[currentRace.CheckpointCurrent].blip = nil
+                    else
+                        SetBlipColour(currentRace.Checkpoints[currentRace.CheckpointCurrent].blip, Config.blip_passed_color)
+                    end
 
                     SetBlipRoute(currentRace.Checkpoints[currentRace.CheckpointCurrent + 1].blip, true)
                     SetBlipRouteColour(currentRace.Checkpoints[currentRace.CheckpointCurrent + 1].blip, Config.blip_color)
@@ -597,6 +603,15 @@ Citizen.CreateThread(function()
                             TriggerServerEvent("ardy_racing:RegisterEventPlayerVehicle", currentRace.EventUID, {Hash = vehHash, Name = vehDName})
                             exports.ardy_easymenu:HideMenuIfNotHidden(GetCurrentResourceName())
                             RegenerateMenu(false)
+
+                            if #currentRace.Checkpoints > 4 and not alwaysAllBlips then
+                                for i = 5, #currentRace.Checkpoints, 1 do
+                                    if currentRace.Checkpoints[i].blip ~= nil then
+                                        RemoveBlip(currentRace.Checkpoints[i].blip)
+                                        currentRace.Checkpoints[i].blip = nil
+                                    end
+                                end
+                            end
                         end
                     elseif raceCleanTime >= 0 and isCountdownFrozen == true then
                         FreezeEntityPosition(vehicle, false)
@@ -626,6 +641,7 @@ Citizen.CreateThread(function()
                         else
                             local nextIndex = currentRace.CheckpointCurrent + 1
                             local nextNextIndex = currentRace.CheckpointCurrent + 2
+                            local nextNextNextIndex = currentRace.CheckpointCurrent + 3
 
                             if nextIndex > #currentRace.Checkpoints then
                                 nextIndex = nextIndex - #currentRace.Checkpoints
@@ -633,18 +649,44 @@ Citizen.CreateThread(function()
                             if nextNextIndex > #currentRace.Checkpoints then
                                 nextNextIndex = nextNextIndex - #currentRace.Checkpoints
                             end
+                            if nextNextNextIndex > #currentRace.Checkpoints then -- TODO refactor this crap
+                                nextNextNextIndex = nextNextNextIndex - #currentRace.Checkpoints
+                            end
 
-                            if nextIndex == 2 then
-                                for _, point in pairs(currentRace.Checkpoints) do
-                                    if point.blip ~= nil then
-                                        SetBlipColour(point.blip, Config.blip_color)
+                            if not alwaysAllBlips and #currentRace.Checkpoints > 4 then
+                                RemoveBlip(currentRace.Checkpoints[currentRace.CheckpointCurrent].blip)
+                                currentRace.Checkpoints[currentRace.CheckpointCurrent].blip = nil
+
+                                if nextNextNextIndex <= #currentRace.Checkpoints and currentRace.Checkpoints[nextNextNextIndex].blip == nil then
+                                    if currentRace.CurrentLap == nil then --SPRINT
+                                        if currentRace.CheckpointCurrent < nextNextNextIndex then
+                                            if currentRace.Checkpoints[nextNextNextIndex].coords ~= nil then
+                                                currentRace.Checkpoints[nextNextNextIndex].blip = CreateRaceBlip(currentRace.Checkpoints[nextNextNextIndex].coords, nextNextNextIndex)
+                                            end
+                                        end
+                                    else --CIRCUIT
+                                        if currentRace.CheckpointCurrent < nextNextNextIndex or
+                                           currentRace.CurrentLap < currentRace.Laps or 
+                                           (currentRace.CurrentLap == currentRace.Laps and nextNextNextIndex == 1) then
+                                            if currentRace.Checkpoints[nextNextNextIndex].coords ~= nil then
+                                                currentRace.Checkpoints[nextNextNextIndex].blip = CreateRaceBlip(currentRace.Checkpoints[nextNextNextIndex].coords, nextNextNextIndex)
+                                            end
+                                        end
+                                    end
+                                end
+                            else
+                                SetBlipColour(currentRace.Checkpoints[currentRace.CheckpointCurrent].blip, Config.blip_passed_color)
+
+                                if nextIndex == 2 then
+                                    for _, point in pairs(currentRace.Checkpoints) do
+                                        if point.blip ~= nil then
+                                            SetBlipColour(point.blip, Config.blip_color)
+                                        end
                                     end
                                 end
                             end
 
                             PlaySoundFrontend(-1, "RACE_PLACED", "HUD_AWARDS")
-
-                            SetBlipColour(currentRace.Checkpoints[currentRace.CheckpointCurrent].blip, Config.blip_passed_color)
 
                             SetBlipRoute(currentRace.Checkpoints[nextIndex].blip, true)
                             SetBlipRouteColour(currentRace.Checkpoints[nextIndex].blip, Config.blip_color)
@@ -897,6 +939,13 @@ function OpenMenu()
                             SetResourceKvpInt('cnf_notificationsBlocked', GetBoolInt(notificationsBlocked))
         
                             buttonRef.NameRight = GetBoolText(notificationsBlocked) 
+                            return buttonRef 
+                        end},
+                        {Name = 'Show all blips in race', NameRight = GetBoolText(alwaysAllBlips), FuncOnSelected = function(buttonRef)
+                            alwaysAllBlips = not alwaysAllBlips
+                            SetResourceKvpInt('cnf_alwaysAllBlips', GetBoolInt(alwaysAllBlips))
+        
+                            buttonRef.NameRight = GetBoolText(alwaysAllBlips) 
                             return buttonRef 
                         end},
                         {Name = 'Debug mode', NameRight = GetBoolText(debugMode), FuncOnSelected = function(buttonRef)
