@@ -381,7 +381,7 @@ AddEventHandler("ardy_racing:OpenRaceLeaderboards", function(raceName, raceType,
         table.sort(leaderboard[ALLCAR], function(left, right) return (isHigherBetter == true and left.Record > right.Record) or (isHigherBetter == false and left.Record < right.Record) end)
 
         local submenu = {
-            MenuTitle = 'GLOBAL',
+            MenuTitle = 'Global',
             Sprite = menuDefaultSprite,
             Buttons = {}
         }
@@ -402,11 +402,13 @@ AddEventHandler("ardy_racing:OpenRaceLeaderboards", function(raceName, raceType,
 
         table.insert(submenu.Buttons,{
             Name = 'Back',
+            Icon = 'back3_w256',
             IsBack = true
         })
 
         table.insert(menu.Buttons, {
-            Name = 'GLOBAL LEADERBOARD - ALL CARS',
+            Name = 'Global - All cars',
+            Icon = 'star_w256',
             SubMenu = submenu
         })
     end
@@ -437,11 +439,13 @@ AddEventHandler("ardy_racing:OpenRaceLeaderboards", function(raceName, raceType,
 
             table.insert(submenu.Buttons,{
                 Name = 'Back',
+                Icon = 'back3_w256',
                 IsBack = true
             })
 
             table.insert(menu.Buttons, {
                 Name = carName,
+                Icon = 'car_w256',
                 --NameRight = carName,
                 SubMenu = submenu
             })
@@ -450,6 +454,7 @@ AddEventHandler("ardy_racing:OpenRaceLeaderboards", function(raceName, raceType,
 
     table.insert(menu.Buttons, {
         Name = 'Back',
+        Icon = 'back3_w256',
         IsBack = true
     })
 
@@ -818,19 +823,19 @@ function OpenMenu()
             Sprite = menuDefaultSprite,
             Buttons = 
             {
-                {Name = 'Joinable events', FuncOnSelected = function()
+                {Name = 'Joinable events', Icon = 'racing_w256', FuncOnSelected = function()
                     SetCurrentState(STATE_AVAILABLEEVENTS, nil, false)
                 end},
-                {Name = 'My races', FuncOnSelected = function()
+                {Name = 'My races', Icon = 'race-track_w256', FuncOnSelected = function()
                     TriggerServerEvent('ardy_racing:GetMyRaces')
                 end},
-                {Name = 'Verified races', FuncOnSelected = function()
+                {Name = 'Verified races', Icon = 'race-track_w128', FuncOnSelected = function()
                     TriggerServerEvent('ardy_racing:GetVerifiedRaces')
                 end},
-                {Name = 'All listed races', FuncOnSelected = function()
+                {Name = 'All listed races', Icon = 'race-track_w256', FuncOnSelected = function()
                     TriggerServerEvent('ardy_racing:GetAllRaces')
                 end},
-                {Name = 'Create new race template', FuncOnSelected = function()
+                {Name = 'Create new race template', Icon = 'new-page_w256', FuncOnSelected = function()
                     SetCurrentState(STATE_EDITOR, 
                     { 
                         Name = 'New race', 
@@ -840,7 +845,7 @@ function OpenMenu()
                         IsUnlisted = true
                     }, true)
                 end},
-                {Name = 'Settings and Tools', SubMenu = {
+                {Name = 'Settings and Tools', Icon = 'settings_w256', SubMenu = {
                     MenuTitle = 'Settings and Tools',
                     Sprite = menuDefaultSprite,
                     Buttons = {
@@ -901,20 +906,20 @@ function OpenMenu()
                             buttonRef.NameRight = GetBoolText(debugMode) 
                             return buttonRef 
                         end},
-                        {Name = 'Back', IsBack = true}
+                        {Name = 'Back', Icon = 'back3_w256', IsBack = true}
                     }
                 }},
-                {Name = 'About', SubMenu = {
+                {Name = 'About', Icon = 'info_w256', SubMenu = {
                     MenuTitle = 'About',
                     Sprite = menuDefaultSprite,
                     Buttons = {
-                        {Name = 'Back', IsBack = true},
+                        {Name = 'Back', Icon = 'back3_w256', IsBack = true},
                         {Name = ' ', IsUnselectable = true},
                         {Name = 'Version', NameRight = '1.1' },
                         {Name = 'Author', NameRight = 'Ardy'}
                     }
                 }},
-                {Name = 'Close', IsBack = true},
+                {Name = 'Close', Icon = 'close3_w256', IsBack = true},
             }
         }
 
@@ -1181,7 +1186,7 @@ function OpenMenu()
                     return buttonRef
                 end},
                 {Name = ' ', IsUnselectable = true},
-                {Name = 'Create event', SubMenu = {
+                {Name = 'Create event', Icon = 'finish-flag_w256', SubMenu = {
                     MenuTitle = 'Confirm event setup?',
                     Sprite = menuDefaultSprite,
                     Buttons = {
@@ -1191,7 +1196,7 @@ function OpenMenu()
                         end}
                     }
                 }},
-                {Name = 'Cancel', SubMenu = {
+                {Name = 'Cancel', Icon = 'close3_w256', SubMenu = {
                     MenuTitle = 'Cancel race setup?',
                     Sprite = menuDefaultSprite,
                     Buttons = {
@@ -1215,7 +1220,7 @@ function OpenMenu()
             Sprite = menuDefaultSprite,
             Buttons = 
             {
-                {Name = 'Join event', ColorOverride = {200, 150, 0, 150, 100, 0}, FuncOnSelected = function()
+                {Name = 'Join event', Icon = 'finish-flag_w256', ColorOverride = {200, 150, 0, 150, 100, 0}, FuncOnSelected = function()
                     local player = GetPlayerPed(-1)
                     local position = GetEntityCoords(player)     
                     local proximity = GetDistanceBetweenCoords(position.x, position.y, position.z, currentRace.Checkpoints[1].coords.x, currentRace.Checkpoints[1].coords.y, currentRace.Checkpoints[1].coords.z, true)
@@ -1227,15 +1232,15 @@ function OpenMenu()
                             TriggerServerEvent('ardy_racing:JoinEvent', currentRace)
                         end
                 end},
-                {Name = 'Set waypoint', FuncOnSelected = function()
+                {Name = 'Set waypoint', Icon = 'target_w256', FuncOnSelected = function()
                     SetWaypointOff()
                     SetNewWaypoint(currentRace.Checkpoints[1].coords.x, currentRace.Checkpoints[1].coords.y)
                 end},
-                {Name = 'Leaderboards', FuncOnSelected = function() 
+                {Name = 'Leaderboards', Icon = 'list_w256', FuncOnSelected = function() 
                     TriggerServerEvent('ardy_racing:GetRaceLeaderboards', currentRace) 
                 end},
-                {Name = 'Hide menu', IsHide = true},
-                {Name = 'Back to event list', IsNavBack = true, FuncOnSelected = function()
+                {Name = 'Hide menu', Icon = 'hidden_w256', IsHide = true},
+                {Name = 'Back to event list', Icon = 'back3_w256', IsNavBack = true, FuncOnSelected = function()
                     SetCurrentState(STATE_AVAILABLEEVENTS, nil, false)
                 end},
                 {Name = ' ', IsUnselectable = true},
@@ -1248,7 +1253,7 @@ function OpenMenu()
                     buttonRef.NameRight = tostring(#currentRace.Players)
                     return buttonRef
                 end},
-                {Name = 'Race starts in ', NameRight = tostring(GetStartInSecondsString(currentRace.StartTime)), FuncRefresh = function(buttonRef) 
+                {Name = 'Race starts in ', Icon = 'start_w256', NameRight = tostring(GetStartInSecondsString(currentRace.StartTime)), FuncRefresh = function(buttonRef) 
                     buttonRef.NameRight = tostring(GetStartInSecondsString(currentRace.StartTime))
                     return buttonRef
                 end},
@@ -1259,6 +1264,7 @@ function OpenMenu()
             table.insert(menu.Buttons, 2, 
             {
                 Name = 'Teleport to start',
+                Icon = 'target_w256',
                 FuncOnSelected = function()
                     local player = GetPlayerPed(-1)
                     if IsPedInAnyVehicle(player, false) then
@@ -1277,12 +1283,12 @@ function OpenMenu()
             Sprite = menuDefaultSprite,
             Buttons = 
             {
-                {Name = 'Joined!', ColorOverride = {0, 200, 0, 0, 150, 0}},
-                {Name = 'Leaderboards', FuncOnSelected = function() 
+                {Name = 'Joined!', Icon = 'confirm_w256', ColorOverride = {0, 200, 0, 0, 150, 0}},
+                {Name = 'Leaderboards', Icon = 'list_w256', FuncOnSelected = function() 
                     TriggerServerEvent('ardy_racing:GetRaceLeaderboards', currentRace) 
                 end},
-                {Name = 'Hide menu', IsHide = true},
-                {Name = 'Leave event', SubMenu = {
+                {Name = 'Hide menu', Icon = 'hidden_w256', IsHide = true},
+                {Name = 'Leave event', Icon = 'close3_w256', SubMenu = {
                     MenuTitle = 'Really leave event?',
                     Sprite = menuDefaultSprite,
                     Buttons = {
@@ -1302,7 +1308,7 @@ function OpenMenu()
                     buttonRef.NameRight = tostring(#currentRace.Players)
                     return buttonRef
                 end},
-                {Name = 'Race starts in ', NameRight = tostring(GetStartInSecondsString(currentRace.StartTime)), FuncRefresh = function(buttonRef) 
+                {Name = 'Race starts in ', Icon = 'start_w256', NameRight = tostring(GetStartInSecondsString(currentRace.StartTime)), FuncRefresh = function(buttonRef) 
                     buttonRef.NameRight = tostring(GetStartInSecondsString(currentRace.StartTime))
                     return buttonRef
                 end},
@@ -1311,7 +1317,7 @@ function OpenMenu()
         }
 
         if currentRace.Type == RACETYPE_DRIFT or currentRace.Type == RACETYPE_DRIFTCIRCUIT then
-            table.insert(menu.Buttons, 3, {Name = 'Car drift tires', NameRight = GetBoolTextDriftTyres(driftTyre), FuncOnSelected = function(buttonRef) 
+            table.insert(menu.Buttons, 3, {Name = 'Car drift tires', Icon = 'drift_w256', NameRight = GetBoolTextDriftTyres(driftTyre), FuncOnSelected = function(buttonRef) 
                 if gameBuild >= 2189 then
                     if Config.enable_drift_tire_manipultion == true then 
                         local player = GetPlayerPed(-1)
@@ -1345,8 +1351,8 @@ function OpenMenu()
             Sprite = menuDefaultSprite,
             Buttons = 
             {
-                {Name = 'Hide menu', IsHide = true},
-                {Name = 'Leave event', SubMenu = {
+                {Name = 'Hide menu', Icon = 'hidden_w256', IsHide = true},
+                {Name = 'Leave event', Icon = 'close3_w256', SubMenu = {
                     MenuTitle = 'Really leave event?',
                     Sprite = menuDefaultSprite,
                     Buttons = {
@@ -1367,10 +1373,10 @@ function OpenMenu()
             {
                 {Name = 'Race name', ExtraLeft = currentRace.Name},
                 {Name = 'Race type', NameRight = GetRaceTypeText(currentRace.Type)},
-                {Name = 'Leaderboards', FuncOnSelected = function() 
+                {Name = 'Leaderboards', Icon = 'list_w256', FuncOnSelected = function() 
                     TriggerServerEvent('ardy_racing:GetRaceLeaderboards', currentRace) 
                 end},
-                {Name = 'Leave event', SubMenu = {
+                {Name = 'Leave event', Icon = 'close3_w256', SubMenu = {
                     MenuTitle = 'Really leave event?',
                     Sprite = menuDefaultSprite,
                     Buttons = {
@@ -1402,7 +1408,7 @@ function OpenListMenu()
         Buttons = {}
     }
 
-    table.insert(menu.Buttons, {Name = 'Back', IsNavBack = true, FuncOnSelected = function()
+    table.insert(menu.Buttons, {Name = 'Back', Icon = 'back3_w256', IsNavBack = true, FuncOnSelected = function()
         SetCurrentState(STATE_NONE, nil, false)
     end})
 
@@ -1432,7 +1438,7 @@ function OpenListMenu()
                 {
                     MenuTitle = race.AuthorName,
                     Sprite = menuDefaultSprite,
-                    Buttons = {{Name = 'Back', IsBack = true}}
+                    Buttons = {{Name = 'Back', Icon = 'back3_w256', IsBack = true}}
                 }
             end
 
@@ -1443,7 +1449,7 @@ function OpenListMenu()
                 {
                     MenuTitle = raceTypeText,
                     Sprite = menuDefaultSprite,
-                    Buttons = {{Name = 'Back', IsBack = true}}
+                    Buttons = {{Name = 'Back', Icon = 'back3_w256', IsBack = true}}
                 }
             end
 
@@ -1453,7 +1459,7 @@ function OpenListMenu()
         local authorSubmenu = {
             MenuTitle = 'By author',
             Sprite = menuDefaultSprite,
-            Buttons = {{Name = 'Back', IsBack = true}}
+            Buttons = {{Name = 'Back', Icon = 'back3_w256', IsBack = true}}
         }
 
         for key, sm in pairs(authorSubmenus) do
@@ -1463,15 +1469,15 @@ function OpenListMenu()
         local raceTypeSubmenu = {
             MenuTitle = 'By race type',
             Sprite = menuDefaultSprite,
-            Buttons = {{Name = 'Back', IsBack = true}}
+            Buttons = {{Name = 'Back', Icon = 'back3_w256', IsBack = true}}
         }
 
         for key, sm in pairs(raceTypeSubmenus) do
             table.insert(raceTypeSubmenu.Buttons, {Name = key, SubMenu = sm})
         end
 
-        table.insert(menu.Buttons, 2, {Name = '[By race type]', SubMenu = raceTypeSubmenu})
-        table.insert(menu.Buttons, 2, {Name = '[By author]', SubMenu = authorSubmenu})
+        table.insert(menu.Buttons, 2, {Name = 'Filter: race type', Icon = 'filter_w256', SubMenu = raceTypeSubmenu})
+        table.insert(menu.Buttons, 2, {Name = 'Filter: author', Icon = 'filter_w256', SubMenu = authorSubmenu})
     end
 
 
@@ -1487,13 +1493,13 @@ function GenerateInspectSubMenu(race)
             Sprite = menuDefaultSprite,
             Buttons = 
             {
-                {Name = 'Create event', FuncOnSelected = function() 
+                {Name = 'Create event', Icon = 'finish-flag_w256', FuncOnSelected = function() 
                     SetCurrentState(STATE_PREPARE, race, true) 
                 end},
-                {Name = 'Leaderboards', FuncOnSelected = function() 
+                {Name = 'Leaderboards', Icon = 'list_w256', FuncOnSelected = function() 
                     TriggerServerEvent('ardy_racing:GetRaceLeaderboards', race) 
                 end},
-                {Name = 'Back', IsBack = true, FuncOnSelected = function()
+                {Name = 'Back', Icon = 'back3_w256', IsBack = true, FuncOnSelected = function()
                     if currentRace ~= nil then 
                         race.IsVerified = currentRace.IsVerified
                     end
@@ -1580,7 +1586,7 @@ function AvailableEventsMenu()
         Buttons = {}
     }
 
-    table.insert(menu.Buttons, {Name = 'Back', IsNavBack = true, FuncOnSelected = function()
+    table.insert(menu.Buttons, {Name = 'Back', Icon = 'back3_w256', IsNavBack = true, FuncOnSelected = function()
         SetCurrentState(STATE_NONE, nil, false)
     end})
 
@@ -1614,6 +1620,7 @@ function GenerateCurrentRacePlayers(menu)
     for index, p in pairs(currentRace.Players) do
         local btn = {
             Name = '#' .. tostring(p.Position) .. ' ' .. p.Name, 
+            Icon = 'user_w256',
             NameRight = GetFinishedPlayerRaceScore(p, currentRace.Type)
         }
 

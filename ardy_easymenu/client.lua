@@ -49,13 +49,15 @@ function RenderMenu()
 	local yHeight = 0.03
     local spacing = 0.000
 
-    local textScale = 0.3 --0.34
+    local textScale = 0.36 --0.34
     local textYOffset = textScale/28.0
     local textMarginName = 0.004
     local textMarginNameRight = xLenght * (2.0/3.0)
     local textMarginExtraLeft = textMarginName
     local textMarginExtraRight = xExtraLenght * (2.0/3.0)
     local textMarginMenuTitle = textMarginName
+
+    local iconScaleFactor = 0.75
 
     local indexMin = CurrentMenu.SelectedIndex - 1 - (CurrentMenu.SelectedIndexVisible);
 	local indexMax = CurrentMenu.SelectedIndex - 1 + (Config.max_menuitems_count - 1 - CurrentMenu.SelectedIndexVisible);
@@ -81,7 +83,7 @@ function RenderMenu()
 		    SetTextColour(0, 0, 0, 255)
         else
             SetTextColour(255, 255, 255, 255)
-            scaleModifier = 1.4
+            scaleModifier = 1.2
             extraYOffset = 0.004
         end
 	    SetTextScale(textScale * scaleModifier, textScale * scaleModifier)
@@ -95,13 +97,13 @@ function RenderMenu()
     end
 
 	if indexMin + 1 > 1 then
-        DrawRect(xOffset - (((yHeight + spacing) / 2.0) * htow + xLenght / 2.0), (yOffset + yHeight * 0), (yHeight - spacing) * htow, yHeight - spacing, 255, 255, 255, 199)
-        DrawSprite('menu_textures', 'arrow2', xOffset - (((yHeight + spacing) / 2.0) * htow + xLenght / 2.0), (yOffset + yHeight * 0), (yHeight - spacing) * htow, yHeight - spacing, 0.0, 255, 255, 255, 150)
+        --DrawRect(xOffset - (((yHeight + spacing) / 2.0) * htow + xLenght / 2.0), (yOffset + yHeight * 0), (yHeight - spacing) * htow, yHeight - spacing, 255, 255, 255, 199)
+        DrawSprite('menu_textures', 'arrow_b256', xOffset - (((yHeight + spacing) / 2.0) * htow + xLenght / 2.0), (yOffset + yHeight * 0), (yHeight - spacing) * htow, yHeight - spacing, 180.0, 255, 255, 255, 150)
     end
 
 	if indexMax + 1 < #CurrentMenu.Buttons then
-        DrawRect(xOffset - (((yHeight + spacing) / 2.0) * htow + xLenght / 2.0), (yOffset + yHeight * (Config.max_menuitems_count - 1)), (yHeight - spacing) * htow, yHeight - spacing, 255, 255, 255, 199)
-        DrawSprite('menu_textures', 'arrow2', xOffset - (((yHeight + spacing) / 2.0) * htow + xLenght / 2.0), (yOffset + yHeight * (Config.max_menuitems_count - 1)), (yHeight - spacing) * htow, yHeight - spacing, 180.0, 255, 255, 255, 150)
+        --DrawRect(xOffset - (((yHeight + spacing) / 2.0) * htow + xLenght / 2.0), (yOffset + yHeight * (Config.max_menuitems_count - 1)), (yHeight - spacing) * htow, yHeight - spacing, 255, 255, 255, 199)
+        DrawSprite('menu_textures', 'arrow_b256', xOffset - (((yHeight + spacing) / 2.0) * htow + xLenght / 2.0), (yOffset + yHeight * (Config.max_menuitems_count - 1)), (yHeight - spacing) * htow, yHeight - spacing, 0.0, 255, 255, 255, 150)
     end
 
 	for i = 1, #CurrentMenu.Buttons, 1 do
@@ -131,22 +133,36 @@ function RenderMenu()
                 end
             end
 
-			SetTextFont(4);
+            DrawRect(xOffset, yOffset + (yHeight * (i - 1 - indexMin)), xLenght, yHeight - spacing, boxColor[1], boxColor[2], boxColor[3], boxColor[4])
+
+			if CurrentMenu.Buttons[i].ExtraLeft ~= nil or CurrentMenu.Buttons[i].ExtraRight ~= nil then
+				DrawRect(xOffset + (xLenght + xExtraLenght)/2.0 + spacing, yOffset + (yHeight * (i - 1 - indexMin)), xExtraLenght, yHeight - spacing, 255, 255, 255, 199)
+            end
+
+            local iconOffset = 0.0
+            if CurrentMenu.Buttons[i].Icon ~= nil then
+                local iconScale = iconScaleFactor
+                if CurrentMenu.Buttons[i].IconScale ~= nil then iconScale = CurrentMenu.Buttons[i].IconScale end
+                DrawSprite('menu_textures', CurrentMenu.Buttons[i].Icon, xOffset + (((yHeight - spacing) / 2.0) * htow) - (xLenght / 2.0), (yOffset + yHeight * (i - 1 - indexMin)), (yHeight - spacing) * iconScale * htow, (yHeight - spacing) * iconScale, 0.0, 255, 255, 255, 200)
+                iconOffset = (yHeight - spacing) * htow - textMarginName
+            end
+			
 
 			if CurrentMenu.Buttons[i].Name ~= nil or CurrentMenu.Buttons[i].Active == true then
+                SetTextFont(4);
 				SetTextScale(textScale, textScale)
 				SetTextColour(255, 255, 255, 255)
 				SetTextEntry("STRING")
                 local stringSelected = ''
                 local stringName = ''
                 if CurrentMenu.Buttons[i].Active then
-                    stringSelected = '> ' 
+                    stringSelected = ' ' 
 				end
                 if CurrentMenu.Buttons[i].Name ~= nil then
                     stringName = CurrentMenu.Buttons[i].Name
                 end
                 AddTextComponentString(stringSelected .. stringName)
-				DrawText(xOffset - xLenght/2.0 + textMarginName, (yOffset + (yHeight * (i - 1 - indexMin)) - textYOffset))
+				DrawText(xOffset - xLenght/2.0 + iconOffset + textMarginName, (yOffset + (yHeight * (i - 1 - indexMin)) - textYOffset))
             end
 
 			if CurrentMenu.Buttons[i].NameRight ~= nil then
@@ -175,13 +191,6 @@ function RenderMenu()
 				AddTextComponentString(CurrentMenu.Buttons[i].ExtraRight)
 				DrawText(xOffset + xLenght/2.0 + spacing + textMarginExtraRight, (yOffset + (yHeight * (i - 1 - indexMin)) - textYOffset))
             end
-			
-            DrawRect(xOffset, yOffset + (yHeight * (i - 1 - indexMin)), xLenght, yHeight - spacing, boxColor[1], boxColor[2], boxColor[3], boxColor[4])
-
-			if CurrentMenu.Buttons[i].ExtraLeft ~= nil or CurrentMenu.Buttons[i].ExtraRight ~= nil then
-				DrawRect(xOffset + (xLenght + xExtraLenght)/2.0 + spacing, yOffset + (yHeight * (i - 1 - indexMin)), xExtraLenght, yHeight - spacing, 255, 255, 255, 199)
-            end
-
         end
     end
 end
