@@ -1,6 +1,6 @@
 ----- DATA LAYER ------
 ServerData = nil;
-DataLocked = false;
+DataLocked = false; -- !!! used in server.lua, take care when converting to SQL
 
 LeaderboardData = nil;
 LeaderboardLocked = false;
