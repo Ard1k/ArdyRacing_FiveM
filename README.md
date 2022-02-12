@@ -2,6 +2,7 @@
 
 I wrote this script mainly to race with my friends on our local server (I hate GTA:O loading times so much), but I also tried to make it appealing for roleplay servers - to support racing communities. Thanks to the leaderboards it may be also useful tool for car devs to set up couple benchmark races to match car-car performance. Feel free to use it and further modify it.
 
+https://www.youtube.com/watch?v=6OyVY8LlxpA
 
 Features:
 - Make your own race templates
