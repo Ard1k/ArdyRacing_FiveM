@@ -345,16 +345,28 @@ end)
 
 ----- END OF DATA LAYER ------
 
-function NotifyPlayerAlert(source, msg)
+function NotifyPlayerAlert_server(source, msg)
 	TriggerClientEvent('ardy_utils:NotifyAlert', source, msg)
 end
 
-function NotifyPlayerError(source, msg)
+function NotifyPlayerError_server(source, msg)
 	TriggerClientEvent('ardy_utils:NotifyError', source, msg)
 end
 
-function NotifyPlayerSuccess(source, msg)
+function NotifyPlayerSuccess_server(source, msg)
 	TriggerClientEvent('ardy_utils:NotifySuccess', source, msg)
+end
+
+function NotifyPlayerAlert_client(msg)
+	exports.ardy_utils:NotifyAlert(msg)
+end
+
+function NotifyPlayerError_client(msg)
+	exports.ardy_utils:NotifyError(msg)
+end
+
+function NotifyPlayerSuccess_client(msg)
+	exports.ardy_utils:NotifySuccess(msg)
 end
 
 function GetPlayerUID(source)

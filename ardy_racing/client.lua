@@ -105,7 +105,7 @@ AddEventHandler("ardy_racing:NewRaceEvent", function(raceEvent)
     table.insert(availableEvents, raceEvent)
     
     if raceEvent.EventCreatorServerId ~= GetPlayerServerId(PlayerId()) and notificationsBlocked ~= true and raceEvent.IsPublic == true then
-        exports.ardy_utils:NotifyAlert('New race event available! Start in '..GetStartInSecondsString(raceEvent.StartTime))
+        NotifyPlayerAlert_client('New race event available! Start in '..GetStartInSecondsString(raceEvent.StartTime))
     end
 end)
 
@@ -121,17 +121,17 @@ AddEventHandler("ardy_racing:AnnounceRaceWinner", function(eventUID, eventType, 
     end
 
     if eventType == RACETYPE_SPRINT or eventType == RACETYPE_CIRCUIT then
-        exports.ardy_utils:NotifyAlert(player.Name .. ' won the race~n~Time: '.. FormatTimeCustom(player.TotalTime) .. inCarString)
+        NotifyPlayerAlert_client(player.Name .. ' won the race~n~Time: '.. FormatTimeCustom(player.TotalTime) .. inCarString)
     elseif eventType == RACETYPE_DRIFT then
         if player.DriftScore == nil then
             player.DriftScore = 0
         end
-        exports.ardy_utils:NotifyAlert(player.Name .. ' won the race~n~Score: '.. tostring(player.DriftScore) .. ' pts' .. inCarString)
+        NotifyPlayerAlert_client(player.Name .. ' won the race~n~Score: '.. tostring(player.DriftScore) .. ' pts' .. inCarString)
     elseif eventType == RACETYPE_DRIFTCIRCUIT then
         if player.BestLapDrift == nil then
             player.BestLapDrift = 0
         end
-        exports.ardy_utils:NotifyAlert(player.Name .. ' won the race~n~Best lap: '.. tostring(player.BestLapDrift) .. ' pts' .. inCarString)
+        NotifyPlayerAlert_client(player.Name .. ' won the race~n~Best lap: '.. tostring(player.BestLapDrift) .. ' pts' .. inCarString)
     end
 end)
 
@@ -148,7 +148,7 @@ AddEventHandler("ardy_racing:PlayerJoinedEvent", function(eventUID, playerObj)
     
     if foundEvent == nil then
         if debugMode == true then
-            exports.ardy_utils:NotifyError('Joined event UID not found: ' .. tostring(eventUID))
+            NotifyPlayerError_client('Joined event UID not found: ' .. tostring(eventUID))
         end
         return -- shouldnt happen, but if somehow... at least it wont crash
     end
@@ -190,7 +190,7 @@ AddEventHandler("ardy_racing:PlayerLeftEvent", function(eventUID, playerServerId
         if reason ~= nil then
             reasonString = ': ' .. reason
         end
-        exports.ardy_utils:NotifyAlert('Race event left' .. reasonString)
+        NotifyPlayerAlert_client('Race event left' .. reasonString)
         SetCurrentState(STATE_NONE, nil, false)
         if foundEvent ~= nil then
             SetCurrentState(STATE_PREJOIN, foundEvent, true)
@@ -223,11 +223,11 @@ AddEventHandler("ardy_racing:PlayerDisqualified", function(eventUID, playerServe
     CallRefresh()
 
     if playerServerId == GetPlayerServerId(PlayerId()) then
-        exports.ardy_utils:NotifyAlert('You have been disqualified: ' .. tostring(reason))
+        NotifyPlayerAlert_client('You have been disqualified: ' .. tostring(reason))
         driftEnabled = GetResourceKvpInt('cnf_driftEnabled') == 1
         SetCurrentState(STATE_AFTERRACE, currentRace, true)
     elseif foundPlayer ~= nil then
-        exports.ardy_utils:NotifyAlert(foundPlayer.Name .. ' have been disqualified')
+        NotifyPlayerAlert_client(foundPlayer.Name .. ' have been disqualified')
         if currentState == STATE_AFTERRACE then
             RegenerateMenu(false)
         end
@@ -261,8 +261,8 @@ AddEventHandler("ardy_racing:NewRecordSet", function(playerServerId, isAllCars, 
         recordScoreString = tostring(record) .. ' pts'
     end
 
-    --exports.ardy_utils:NotifyAlert(playerName .. ' set new record~n~Race:' .. eventName .. '~n~Race type: ' .. GetRaceTypeText(eventType) .. '~n~Leaderboard: ' .. leaderboard .. '~n~Rank: #' .. tostring(position) .. '~n~Car: ' .. tostring(carName) .. recordString .. recordScoreString)
-    exports.ardy_utils:NotifyAlert(playerName .. ' set new record~n~Race:' .. eventName .. leaderboard .. '~n~Rank: #' .. tostring(position) .. '~n~Car: ' .. tostring(carName) .. recordString .. recordScoreString)
+    --NotifyPlayerAlert_client(playerName .. ' set new record~n~Race:' .. eventName .. '~n~Race type: ' .. GetRaceTypeText(eventType) .. '~n~Leaderboard: ' .. leaderboard .. '~n~Rank: #' .. tostring(position) .. '~n~Car: ' .. tostring(carName) .. recordString .. recordScoreString)
+    NotifyPlayerAlert_client(playerName .. ' set new record~n~Race:' .. eventName .. leaderboard .. '~n~Rank: #' .. tostring(position) .. '~n~Car: ' .. tostring(carName) .. recordString .. recordScoreString)
 end)
 
 RegisterNetEvent("ardy_racing:RaceServerHeartbeat")
@@ -280,7 +280,7 @@ RegisterNetEvent("ardy_racing:RaceRenamed")
 AddEventHandler("ardy_racing:RaceRenamed", function(oldName, newName)
     if currentRace ~= nil and currentRace.Name == oldName then
         SetCurrentState(STATE_NONE, nil, false)
-        exports.ardy_utils:NotifyAlert('Menu refreshed - current race was renamed')
+        NotifyPlayerAlert_client('Menu refreshed - current race was renamed')
     end
 end)
 
@@ -297,12 +297,12 @@ end)
 RegisterNetEvent("ardy_racing:PlayerFinishedEvent")
 AddEventHandler("ardy_racing:PlayerFinishedEvent", function(eventUID, playerObj, players)
     if currentState ~= STATE_RACING and currentState ~= STATE_AFTERRACE then
-        if debugMode then exports.ardy_utils:NotifyAlert('DEBUG: PlayerFinishedEvent - not in specific state') end
+        if debugMode then NotifyPlayerAlert_client('DEBUG: PlayerFinishedEvent - not in specific state') end
         return
     end
 
     if currentRace == nil or currentRace.EventUID ~= eventUID then
-        if debugMode then exports.ardy_utils:NotifyAlert('DEBUG: PlayerFinishedEvent - different eventUID') end
+        if debugMode then NotifyPlayerAlert_client('DEBUG: PlayerFinishedEvent - different eventUID') end
         return
     end
     
@@ -322,7 +322,7 @@ AddEventHandler("ardy_racing:PlayerFinishedEvent", function(eventUID, playerObj,
         driftEnabled = GetResourceKvpInt('cnf_driftEnabled') == 1
         --exports.ardy_utils:NotifySuccess('You finished the race!') -- useless spam
     else
-        exports.ardy_utils:NotifyAlert(playerObj.Name .. ' finished the race!')
+        NotifyPlayerAlert_client(playerObj.Name .. ' finished the race!')
     end
 end)
 
@@ -907,10 +907,10 @@ function OpenMenu()
                                     buttonRef.NameRight = GetBoolTextDriftTyres(driftTyre) 
                                     return buttonRef
                                 else
-                                    exports.ardy_utils:NotifyError('Server admin has disabled this feature')
+                                    NotifyPlayerError_client('Server admin has disabled this feature')
                                 end
                             else
-                                exports.ardy_utils:NotifyError('Server has unsupported build')
+                                NotifyPlayerError_client('Server has unsupported build')
                             end
                         end,
                         FuncRefresh = function(buttonRef)
@@ -984,7 +984,7 @@ function OpenMenu()
                 input = input:match'^%s*(.*%S)' or ''
                 local hash = GetHashKey(input)
                 if hash == nil then
-                    exports.ardy_utils:NotifyError('Invalid model - can not get hash')
+                    NotifyPlayerError_client('Invalid model - can not get hash')
                 else
                     TriggerServerEvent("ardy_racing:Admin_clearHashFromLeaderboards", adminKey, hash)
                 end
@@ -1060,9 +1060,9 @@ function OpenMenu()
                     input = input:match'^%s*(.*%S)' or ''
                     local laps = tonumber(input)
                     if currentRace.Type ~= RACETYPE_CIRCUIT and currentRace.Type ~= RACETYPE_DRIFTCIRCUIT then
-                        exports.ardy_utils:NotifyError('Not a circuit!')
+                        NotifyPlayerError_client('Not a circuit!')
                     elseif laps == nil then
-                        exports.ardy_utils:NotifyError('Invalid number!')
+                        NotifyPlayerError_client('Invalid number!')
                     else
                         currentRace.Laps = laps
                     end
@@ -1105,7 +1105,7 @@ function OpenMenu()
 
                         CallRefresh()
                     else
-                        exports.ardy_utils:NotifyError('No checkpoint to remove!')
+                        NotifyPlayerError_client('No checkpoint to remove!')
                     end
 
                     return buttonRef
@@ -1184,9 +1184,9 @@ function OpenMenu()
                     input = input:match'^%s*(.*%S)' or ''
                     local laps = tonumber(input)
                     if currentRace.Type ~= RACETYPE_CIRCUIT and currentRace.Type ~= RACETYPE_DRIFTCIRCUIT then
-                        exports.ardy_utils:NotifyError('Not a circuit!')
+                        NotifyPlayerError_client('Not a circuit!')
                     elseif laps == nil then
-                        exports.ardy_utils:NotifyError('Invalid number!')
+                        NotifyPlayerError_client('Invalid number!')
                     else
                         currentRace.Laps = laps
                     end
@@ -1198,7 +1198,7 @@ function OpenMenu()
                 --     input = input:match'^%s*(.*%S)' or ''
                 --     local seconds = tonumber(input)
                 --     if (seconds == nil) then
-                --         exports.ardy_utils:NotifyError('Invalid number!')
+                --         NotifyPlayerError_client('Invalid number!')
                 --     else
                 --         currentRace.EndTimerAfterFirst = seconds
                 --     end
@@ -1210,9 +1210,9 @@ function OpenMenu()
                     input = input:match'^%s*(.*%S)' or ''
                     local seconds = tonumber(input)
                     if (seconds == nil) then
-                        exports.ardy_utils:NotifyError('Invalid number!')
+                        NotifyPlayerError_client('Invalid number!')
                     elseif (seconds < 10) then
-                        exports.ardy_utils:NotifyError('Minimum is 10 seconds!')
+                        NotifyPlayerError_client('Minimum is 10 seconds!')
                     else
                         currentRace.StartIn = seconds
                     end
@@ -1274,9 +1274,9 @@ function OpenMenu()
                     local position = GetEntityCoords(player)     
                     local proximity = GetDistanceBetweenCoords(position.x, position.y, position.z, currentRace.Checkpoints[1].coords.x, currentRace.Checkpoints[1].coords.y, currentRace.Checkpoints[1].coords.z, true)
                         if currentRace.StartTime < GetNetworkTime() then
-                            exports.ardy_utils:NotifyError('Race has already started')
+                            NotifyPlayerError_client('Race has already started')
                         elseif proximity > (Config.start_radius / 2.0) then
-                            exports.ardy_utils:NotifyAlert('You are too far away from start')
+                            NotifyPlayerAlert_client('You are too far away from start')
                         else
                             TriggerServerEvent('ardy_racing:JoinEvent', currentRace)
                         end
@@ -1382,10 +1382,10 @@ function OpenMenu()
                         buttonRef.NameRight = GetBoolTextDriftTyres(driftTyre) 
                         return buttonRef
                     else
-                        exports.ardy_utils:NotifyError('Server admin has disabled this feature')
+                        NotifyPlayerError_client('Server admin has disabled this feature')
                     end
                 else
-                    exports.ardy_utils:NotifyError('Server has unsupported build')
+                    NotifyPlayerError_client('Server has unsupported build')
                 end
             end,
             FuncRefresh = function(buttonRef)

@@ -47,7 +47,7 @@ function ProcessLeaderboard(event, playerData, sourceCopy, startVehicle, finisVe
         end
 
         if startVehicle.Hash ~= finisVehicle.Hash then
-            NotifyPlayerError(src, 'Leaderboard skipped. Car model changed during race!')
+            NotifyPlayerError_server(src, 'Leaderboard skipped. Car model changed during race!')
             return
         end
 
@@ -85,17 +85,17 @@ RegisterNetEvent("ardy_racing:SaveRace")
 AddEventHandler("ardy_racing:SaveRace", function(race)
     local src = source
     if race == nil then
-        NotifyPlayerError(src, 'Race data invalid')
+        NotifyPlayerError_server(src, 'Race data invalid')
         return
     end
 
     if race.Checkpoints == nil or #race.Checkpoints <= 0 then
-        NotifyPlayerError(src, 'Race must have at least 2 checkpoints')
+        NotifyPlayerError_server(src, 'Race must have at least 2 checkpoints')
         return
     end
 
     if race.Name == nil or race.Name == '' then
-        NotifyPlayerError(src, 'Race must have name')
+        NotifyPlayerError_server(src, 'Race must have name')
         return
     end
 
@@ -112,7 +112,7 @@ AddEventHandler("ardy_racing:SaveRace", function(race)
 
     if DoesRaceWithNameExist(race.Name) then
         DataLocked = false
-        NotifyPlayerError(src, 'Race with this name already exist')
+        NotifyPlayerError_server(src, 'Race with this name already exist')
         return
     end
 
@@ -122,7 +122,7 @@ AddEventHandler("ardy_racing:SaveRace", function(race)
     AddRace(race)
     DataLocked = false
 
-    NotifyPlayerSuccess(src, 'Race saved!')
+    NotifyPlayerSuccess_server(src, 'Race saved!')
     TriggerClientEvent('ardy_racing:RaceSaved', src)
 end)
 
@@ -130,7 +130,7 @@ RegisterNetEvent("ardy_racing:AdminLogin")
 AddEventHandler("ardy_racing:AdminLogin", function(pass)
     local src = source
     if pass ~= AdminPassword then
-        NotifyPlayerError(src, 'Invalid password')
+        NotifyPlayerError_server(src, 'Invalid password')
         return
     end
 
@@ -141,29 +141,29 @@ RegisterNetEvent("ardy_racing:Admin_clearHashFromLeaderboards")
 AddEventHandler("ardy_racing:Admin_clearHashFromLeaderboards", function(admKey, hash)
     local src = source
     if admKey ~= AdminKey then
-        NotifyPlayerError(src, 'Unauthorized')
+        NotifyPlayerError_server(src, 'Unauthorized')
         return
     end
 
     RemoveVehicleHashFromLeaderboards(hash)
-    NotifyPlayerSuccess(src, tostring(hash) .. ' removed from leaderboards')
+    NotifyPlayerSuccess_server(src, tostring(hash) .. ' removed from leaderboards')
 end)
 
 RegisterNetEvent("ardy_racing:Admin_renameRace")
 AddEventHandler("ardy_racing:Admin_renameRace", function(admKey, oldName, newName)
     local src = source
     if admKey ~= AdminKey then
-        NotifyPlayerError(src, 'Unauthorized')
+        NotifyPlayerError_server(src, 'Unauthorized')
         return
     end
 
     if DoesRaceWithNameExist(newName) then
-        NotifyPlayerError(src, 'Race with this name already exist')
+        NotifyPlayerError_server(src, 'Race with this name already exist')
         return
     end
 
     RenameRace(oldName, newName)
-    NotifyPlayerSuccess(src, 'Race renamed from: ' .. oldName .. 'To: ' .. newName)
+    NotifyPlayerSuccess_server(src, 'Race renamed from: ' .. oldName .. 'To: ' .. newName)
     TriggerClientEvent("ardy_racing:RaceRenamed", -1, oldName, newName)
 end)
 
@@ -171,19 +171,19 @@ RegisterNetEvent("ardy_racing:VerifyRace")
 AddEventHandler("ardy_racing:VerifyRace", function(isVerified, race, admKey)
     local src = source
     if admKey ~= AdminKey then
-        NotifyPlayerError(src, 'Unauthorized')
+        NotifyPlayerError_server(src, 'Unauthorized')
         return
     end
 
     if race == nil then
-        NotifyPlayerError(src, 'Invalid data')
+        NotifyPlayerError_server(src, 'Invalid data')
         return
     end
 
     local ret = SetRaceVerified(race.Name, isVerified)
 
     if ret == false then
-        NotifyPlayerError(src, 'Unable to verify')
+        NotifyPlayerError_server(src, 'Unable to verify')
         return
     end
 
@@ -195,7 +195,7 @@ AddEventHandler("ardy_racing:SetRaceUnlisted", function(isUnlisted, race)
     local src = source
 
     if race == nil then
-        NotifyPlayerError(src, 'Invalid data')
+        NotifyPlayerError_server(src, 'Invalid data')
         return
     end
 
@@ -203,14 +203,14 @@ AddEventHandler("ardy_racing:SetRaceUnlisted", function(isUnlisted, race)
 
     if serverRace.AuthorUID ~= GetPlayerUID(src) then
         DataLocked = false
-        NotifyPlayerError(src, 'You are not author of this race')
+        NotifyPlayerError_server(src, 'You are not author of this race')
         return
     end
 
     local ret = SetRaceUnlisted(race.Name, isUnlisted)
 
     if ret == false then
-        NotifyPlayerError(src, 'Unable to set listed status')
+        NotifyPlayerError_server(src, 'Unable to set listed status')
         return
     end
 
@@ -221,7 +221,7 @@ RegisterNetEvent("ardy_racing:DeleteRace")
 AddEventHandler("ardy_racing:DeleteRace", function(race)
     local src = source
     if race == nil then
-        NotifyPlayerError(src, 'Race data invalid')
+        NotifyPlayerError_server(src, 'Race data invalid')
         return
     end
 
@@ -235,26 +235,26 @@ AddEventHandler("ardy_racing:DeleteRace", function(race)
 
     if serverRace == nil then
         DataLocked = false
-        NotifyPlayerError(src, 'Race with this name does not exist')
+        NotifyPlayerError_server(src, 'Race with this name does not exist')
         return
     end
 
     if serverRace.AuthorUID ~= GetPlayerUID(src) then
         DataLocked = false
-        NotifyPlayerError(src, 'You are not author of this race')
+        NotifyPlayerError_server(src, 'You are not author of this race')
         return
     end
 
     if serverRace.IsVerified == true then
         DataLocked = false
-        NotifyPlayerError(src, 'You can not delete verified race')
+        NotifyPlayerError_server(src, 'You can not delete verified race')
         return
     end
 
     DeleteRace(race)
     DataLocked = false
 
-    NotifyPlayerSuccess(src, 'Race deleted!')
+    NotifyPlayerSuccess_server(src, 'Race deleted!')
     TriggerClientEvent('ardy_racing:RaceDeleted', src)
 
     DeleteLeaderboards(race.Name)
@@ -264,12 +264,12 @@ RegisterNetEvent("ardy_racing:CreateEvent")
 AddEventHandler("ardy_racing:CreateEvent", function(race)
     local src = source
     if race == nil then
-        NotifyPlayerError(src, 'Event data invalid')
+        NotifyPlayerError_server(src, 'Event data invalid')
         return
     end
 
     if race.Checkpoints == nil or #race.Checkpoints < 2 then
-        NotifyPlayerError(src, 'Not enough checkpoints')
+        NotifyPlayerError_server(src, 'Not enough checkpoints')
         return
     end
 
@@ -288,14 +288,14 @@ AddEventHandler("ardy_racing:CreateEvent", function(race)
     TriggerClientEvent('ardy_racing:NewRaceEvent', -1, race)
 
     TriggerClientEvent('ardy_racing:OpenCreatedEvent', src, race)
-    NotifyPlayerSuccess(src, 'Event created!')
+    NotifyPlayerSuccess_server(src, 'Event created!')
 end)
 
 RegisterNetEvent("ardy_racing:JoinEvent")
 AddEventHandler("ardy_racing:JoinEvent", function(race)
     local src = source
     if race == nil then
-        NotifyPlayerError(src, 'Event data invalid')
+        NotifyPlayerError_server(src, 'Event data invalid')
         return
     end
 
@@ -309,13 +309,13 @@ AddEventHandler("ardy_racing:JoinEvent", function(race)
     end
 
     if foundEvent == nil then
-        NotifyPlayerError(src, 'Event is no longer available')
+        NotifyPlayerError_server(src, 'Event is no longer available')
         return
     end
 
     for _, player in pairs(foundEvent.Players) do
         if player.Id == src then
-            NotifyPlayerError(src, 'You are already joined in this race')
+            NotifyPlayerError_server(src, 'You are already joined in this race')
             return
         end
     end
@@ -342,7 +342,7 @@ RegisterNetEvent("ardy_racing:RegisterEventPlayerVehicle")
 AddEventHandler("ardy_racing:RegisterEventPlayerVehicle", function(eventUID, vehicleData)
     local src = source
     if vehicleData == nil then
-        NotifyPlayerError(src, 'VehicleData data invalid')
+        NotifyPlayerError_server(src, 'VehicleData data invalid')
         return
     end
 
@@ -356,7 +356,7 @@ AddEventHandler("ardy_racing:RegisterEventPlayerVehicle", function(eventUID, veh
     end
 
     if foundEvent == nil then
-        NotifyPlayerError(src, 'Event not found')
+        NotifyPlayerError_server(src, 'Event not found')
         return
     end
 
@@ -376,7 +376,7 @@ RegisterNetEvent("ardy_racing:LeaveEvent")
 AddEventHandler("ardy_racing:LeaveEvent", function(race, reason)
     local src = source
     if race == nil then
-        NotifyPlayerError(src, 'Event data invalid')
+        NotifyPlayerError_server(src, 'Event data invalid')
         return
     end
 
@@ -420,7 +420,7 @@ AddEventHandler("ardy_racing:GetMyRaces", function()
     local races = GetRacesByAuthorUID(GetPlayerUID(src))
 
     if races == nil or #races <= 0 then
-        NotifyPlayerError(src, 'No races found')
+        NotifyPlayerError_server(src, 'No races found')
         return
     end
 
@@ -430,7 +430,7 @@ end)
 RegisterNetEvent("ardy_racing:GetRaceLeaderboards")
 AddEventHandler("ardy_racing:GetRaceLeaderboards", function(race)
     if race == nil then
-        NotifyPlayerError(src, 'Invalid race data')
+        NotifyPlayerError_server(src, 'Invalid race data')
         return
     end
 
@@ -446,7 +446,7 @@ AddEventHandler("ardy_racing:GetAllRaces", function()
     local races = GetAllRaces()
 
     if races == nil or #races <= 0 then
-        NotifyPlayerError(src, 'No races found')
+        NotifyPlayerError_server(src, 'No races found')
         return
     end
 
@@ -457,14 +457,14 @@ RegisterNetEvent("ardy_racing:GetAllUnlistedRaces")
 AddEventHandler("ardy_racing:GetAllUnlistedRaces", function(admKey)
     local src = source
     if admKey ~= AdminKey then
-        NotifyPlayerError(src, 'Unauthorized')
+        NotifyPlayerError_server(src, 'Unauthorized')
         return
     end
 
     local races = GetAllUnlistedRaces()
 
     if races == nil or #races <= 0 then
-        NotifyPlayerError(src, 'No races found')
+        NotifyPlayerError_server(src, 'No races found')
         return
     end
 
@@ -477,7 +477,7 @@ AddEventHandler("ardy_racing:GetVerifiedRaces", function()
     local races = GetVerifiedRaces()
 
     if races == nil or #races <= 0 then
-        NotifyPlayerError(src, 'No races found')
+        NotifyPlayerError_server(src, 'No races found')
         return
     end
 
@@ -489,7 +489,7 @@ AddEventHandler("ardy_racing:RaceFinished", function(eventUID, paramTbl)
     local src = source
 
     if eventUID == nil then
-        NotifyPlayerError(src, 'Invalid data')
+        NotifyPlayerError_server(src, 'Invalid data')
         return
     end
 
@@ -503,7 +503,7 @@ AddEventHandler("ardy_racing:RaceFinished", function(eventUID, paramTbl)
     end
 
     if foundEvent == nil then
-        NotifyPlayerError(src, 'Race event not found')
+        NotifyPlayerError_server(src, 'Race event not found')
         return
     end
 
@@ -517,7 +517,7 @@ AddEventHandler("ardy_racing:RaceFinished", function(eventUID, paramTbl)
     end
 
     if foundPlayer == nil then
-        NotifyPlayerError(src, 'You are not recognized as participant')
+        NotifyPlayerError_server(src, 'You are not recognized as participant')
         return
     end
 
@@ -542,7 +542,7 @@ RegisterNetEvent("ardy_racing:RaceClientHeartbeat")
 AddEventHandler("ardy_racing:RaceClientHeartbeat", function(eventUID, paramTbl)
     local src = source
     if eventUID == nil then
-        NotifyPlayerError(src, 'DEBUG: Invalid data')
+        NotifyPlayerError_server(src, 'DEBUG: Invalid data')
         return
     end
 
@@ -556,7 +556,7 @@ AddEventHandler("ardy_racing:RaceClientHeartbeat", function(eventUID, paramTbl)
     end
 
     if foundEvent == nil then
-        NotifyPlayerError(src, 'DEBUG: Race event not found')
+        NotifyPlayerError_server(src, 'DEBUG: Race event not found')
         return
     end
 
@@ -570,7 +570,7 @@ AddEventHandler("ardy_racing:RaceClientHeartbeat", function(eventUID, paramTbl)
     end
 
     if foundPlayer == nil then
-        NotifyPlayerError(src, 'DEBUG: You are not recognized as participant')
+        NotifyPlayerError_server(src, 'DEBUG: You are not recognized as participant')
         return
     end
 
