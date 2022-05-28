@@ -157,7 +157,7 @@ AddEventHandler("ardy_racing:PlayerJoinedEvent", function(eventUID, playerObj)
     CallRefresh()
     
     if playerObj.Id == GetPlayerServerId(PlayerId()) then
-        exports.ardy_utils:NotifySuccess('Joined race event')
+        NotifyPlayerSuccess_client'Joined race event')
         SetCurrentState(STATE_JOINED, foundEvent, false)
     end
 end)
@@ -286,7 +286,7 @@ end)
 
 RegisterNetEvent("ardy_racing:AdminLoginSuccess")
 AddEventHandler("ardy_racing:AdminLoginSuccess", function(key)
-    exports.ardy_utils:NotifySuccess('Logged as admin')
+    NotifyPlayerSuccess_client('Logged as admin')
 
     isAdmin = true
     adminKey = key
@@ -320,7 +320,7 @@ AddEventHandler("ardy_racing:PlayerFinishedEvent", function(eventUID, playerObj,
     
     if playerObj.Id == GetPlayerServerId(PlayerId()) then
         driftEnabled = GetResourceKvpInt('cnf_driftEnabled') == 1
-        --exports.ardy_utils:NotifySuccess('You finished the race!') -- useless spam
+        --NotifyPlayerSuccess_client('You finished the race!') -- useless spam
     else
         NotifyPlayerAlert_client(playerObj.Name .. ' finished the race!')
     end
@@ -350,7 +350,7 @@ AddEventHandler("ardy_racing:RaceVerificationSet", function(raceName, isVerified
         CallRefresh()
     end 
     
-    exports.ardy_utils:NotifySuccess('Verification updated!')
+    NotifyPlayerSuccess_client('Verification updated!')
 end)
 
 RegisterNetEvent("ardy_racing:RaceUnlistedSet")
@@ -360,7 +360,7 @@ AddEventHandler("ardy_racing:RaceUnlistedSet", function(raceName, isUnlisted)
         CallRefresh()
     end 
     
-    exports.ardy_utils:NotifySuccess('Listed status updated!')
+    NotifyPlayerSuccess_client('Listed status updated!')
 end)
 
 RegisterNetEvent("ardy_racing:OpenRaceLeaderboards")
