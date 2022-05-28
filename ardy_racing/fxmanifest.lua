@@ -3,6 +3,7 @@ game 'gta5'
 
 client_scripts {
     "constants.lua",
+    "client_interfacing.lua",
     "client_helperfunc.lua",
     "client_drift.lua",
     "client_honkflash.lua",

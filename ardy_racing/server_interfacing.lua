@@ -357,18 +357,6 @@ function NotifyPlayerSuccess_server(source, msg)
 	TriggerClientEvent('ardy_utils:NotifySuccess', source, msg)
 end
 
-function NotifyPlayerAlert_client(msg)
-	exports.ardy_utils:NotifyAlert(msg)
-end
-
-function NotifyPlayerError_client(msg)
-	exports.ardy_utils:NotifyError(msg)
-end
-
-function NotifyPlayerSuccess_client(msg)
-	exports.ardy_utils:NotifySuccess(msg)
-end
-
 function GetPlayerUID(source)
     return string.sub(GetPlayerIdentifier(source, 0), 9, -1)
 end
