@@ -291,6 +291,33 @@ AddEventHandler("ardy_racing:CreateEvent", function(race)
     NotifyPlayerSuccess_server(src, 'Event created!')
 end)
 
+RegisterNetEvent("ardy_racing:UpdateEventStart")
+AddEventHandler("ardy_racing:UpdateEventStart", function(eventUID, seconds)
+    local src = source
+    if eventUID == nil then
+        NotifyPlayerError_server(src, 'EventUID is null - report it')
+        return
+    end
+
+    local foundEvent = nil
+
+    for _, event in pairs(RunningEvents) do
+        if event.EventUID == eventUID then
+            foundEvent = event
+            break
+        end
+    end
+
+    if foundEvent == nil then
+        NotifyPlayerError_server(src, 'Event not found')
+        return
+    end
+
+    foundEvent.StartTime = GetGameTimer() + (seconds * 1000)
+
+    TriggerClientEvent('ardy_racing:EventStartUpdated', -1, foundEvent)
+end)
+
 RegisterNetEvent("ardy_racing:JoinEvent")
 AddEventHandler("ardy_racing:JoinEvent", function(race)
     local src = source

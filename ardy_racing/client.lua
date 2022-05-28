@@ -79,6 +79,7 @@ function SetCurrentState(state, race, forceReopen)
         currentRace.ValidateProgress = true
         currentRace.AllowExitCar = true
         currentRace.IsRanked = true
+        currentRace.EventCreatorServerId = GetPlayerServerId(PlayerId())
     end
 
     RegenerateMenu(forceReopen)
@@ -107,6 +108,23 @@ AddEventHandler("ardy_racing:NewRaceEvent", function(raceEvent)
     if raceEvent.EventCreatorServerId ~= GetPlayerServerId(PlayerId()) and notificationsBlocked ~= true and raceEvent.IsPublic == true then
         NotifyPlayerAlert_client('New race event available! Start in '..GetStartInSecondsString(raceEvent.StartTime))
     end
+end)
+
+RegisterNetEvent("ardy_racing:EventStartUpdated")
+AddEventHandler("ardy_racing:EventStartUpdated", function(raceEvent)
+    for _, r in pairs(availableEvents) do
+        if r.EventUID == raceEvent.EventUID then
+            r.StartTime = raceEvent.StartTime
+            break
+        end
+    end
+    
+    if currentRace == nil or currentRace.EventUID ~= raceEvent.EventUID then
+        return
+    end
+
+    currentRace.StartTime = raceEvent.StartTime
+    NotifyPlayerAlert_client('Race start updated')
 end)
 
 RegisterNetEvent("ardy_racing:AnnounceRaceWinner")
@@ -1393,6 +1411,21 @@ function OpenMenu()
                 return buttonRef
             end})
         end
+
+        if currentRace.EventCreatorServerId == GetPlayerServerId(PlayerId()) then
+            table.insert(menu.Buttons, 2, {Name = 'Set start in 10s', Icon = 'racing_w256', SubMenu = {
+                MenuTitle = 'Set start in 10s?',
+                Sprite = menuDefaultSprite,
+                Buttons = {
+                    {Name = 'No', IsBack = true},
+                    {Name = 'Yes', IsBack = true, FuncOnSelected = function()
+                        TriggerServerEvent('ardy_racing:UpdateEventStart', currentRace.EventUID, 10)
+                    end}
+                }
+            }})
+        end
+
+    
     elseif currentState == STATE_RACING then
         menu = 
         {
