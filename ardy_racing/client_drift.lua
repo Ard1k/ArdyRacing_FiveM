@@ -150,8 +150,8 @@ Citizen.CreateThread(function()
                     DrawLine(vehPos.x, vehPos.y, vehPos.z + 1.1, vehPos.x + movementVector.x, vehPos.y + movementVector.y, vehPos.z + 1.1, 0, 255, 0, 255)
                 end
 
-                if currentRace ~= nil and currentState == STATE_RACING and (checkpointDistance - checkpointMinDistance) > Config.drift_max_reverse_dist then 
-                    currentRace.DriftScore = 0
+                if currentRace ~= nil and currentState == STATE_RACING and (currentRace.Type == RACETYPE_DRIFT or currentRace.Type == RACETYPE_DRIFTCIRCUIT) and (checkpointDistance - checkpointMinDistance) > Config.drift_max_reverse_dist then 
+                    --currentRace.DriftScore = 0
                     ResetDrift()
                     DriftResultText('DONT CHEAT', 255, 200, 0)
                 end
