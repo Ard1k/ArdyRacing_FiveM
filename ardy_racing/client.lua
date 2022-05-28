@@ -157,7 +157,7 @@ AddEventHandler("ardy_racing:PlayerJoinedEvent", function(eventUID, playerObj)
     CallRefresh()
     
     if playerObj.Id == GetPlayerServerId(PlayerId()) then
-        NotifyPlayerSuccess_client'Joined race event')
+        NotifyPlayerSuccess_client('Joined race event')
         SetCurrentState(STATE_JOINED, foundEvent, false)
     end
 end)
