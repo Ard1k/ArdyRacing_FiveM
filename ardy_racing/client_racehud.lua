@@ -2,14 +2,6 @@ hudData = nil
 local hudLeftIndex = 0
 local hudRightIndex = 0
 
---[[
-    hud_left_pos_x = 0.2,
-    hud_left_pos_y = 0.2,
-
-    hud_right_pos_x = 0.95,
-    hud_right_pos_y = 0.05,
-]]--
-
 -- update hud data
 Citizen.CreateThread(function() 
     while true do

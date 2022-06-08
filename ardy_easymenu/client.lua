@@ -2,6 +2,24 @@ local IsHidden = true;
 local CurrentMenu = nil;
 local ResourceNameMenu = nil;
 
+local xOffset = Config.xOffset
+local xLenght = Config.xLenght
+local xExtraLenght = Config.xExtraLenght
+
+local yOffset = Config.yOffset
+local yHeight = Config.yHeight
+local spacing = Config.spacing
+
+local textScale = Config.textScale
+local textYOffset = Config.textYOffset
+local textMarginName = Config.textMarginName
+local textMarginNameRight = Config.textMarginNameRight
+local textMarginExtraLeft = Config.textMarginExtraLeft
+local textMarginExtraRight = Config.textMarginExtraRight
+local textMarginMenuTitle = Config.textMarginMenuTitle
+
+local iconScaleFactor = Config.iconScaleFactor
+
 -- Main Loop
 Citizen.CreateThread(function()
     while true do
@@ -26,10 +44,6 @@ function CheckCurrentMenu()
     if CurrentMenu.SelectedIndexVisible == nil or CurrentMenu.SelectedIndexVisible < 0 then
         CurrentMenu.SelectedIndexVisible = 0
     end
-
-    --for i = 1, i <= CurrentMenu.Buttons, 1 do
-        
-    --end
 end
 
 function RenderMenu()
@@ -40,24 +54,6 @@ function RenderMenu()
     local screen_w, screen_h = GetActiveScreenResolution()
     local htow = screen_h/screen_w
     local wtoh = screen_w/screen_h
-
-    local xOffset = 0.7
-    local xLenght = 0.15
-    local xExtraLenght = 0.11
-
-    local yOffset = 0.25
-	local yHeight = 0.03
-    local spacing = 0.000
-
-    local textScale = 0.36 --0.34
-    local textYOffset = textScale/28.0
-    local textMarginName = 0.004
-    local textMarginNameRight = xLenght * (2.0/3.0)
-    local textMarginExtraLeft = textMarginName
-    local textMarginExtraRight = xExtraLenght * (2.0/3.0)
-    local textMarginMenuTitle = textMarginName
-
-    local iconScaleFactor = 0.75
 
     local indexMin = CurrentMenu.SelectedIndex - 1 - (CurrentMenu.SelectedIndexVisible);
 	local indexMax = CurrentMenu.SelectedIndex - 1 + (Config.max_menuitems_count - 1 - CurrentMenu.SelectedIndexVisible);
