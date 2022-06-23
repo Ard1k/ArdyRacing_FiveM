@@ -5,26 +5,85 @@ DataLocked = false; -- !!! used in server.lua, take care when converting to SQL
 LeaderboardData = nil;
 LeaderboardLocked = false;
 
-local stringData = GetResourceKvpString('data');
-if stringData ~= nil then
-    ServerData = json.decode(stringData)
+local sqlEnabled = (Config.use_sql == true and MySQL ~= nil)
+if sqlEnabled == false then
+    local stringData = GetResourceKvpString('data');
+    if stringData ~= nil then
+        ServerData = json.decode(stringData)
+    else
+        ServerData = {}
+        ServerData.Races = {}
+    end
+
+    local stringLeaderboardData = GetResourceKvpString('leaderBoardData');
+    if stringLeaderboardData ~= nil then
+        LeaderboardData = json.decode(stringLeaderboardData)
+    else
+        LeaderboardData = {}
+        LeaderboardData.Races = {}
+    end
 else
     ServerData = {}
     ServerData.Races = {}
-end
 
-local stringLeaderboardData = GetResourceKvpString('leaderBoardData');
-if stringLeaderboardData ~= nil then
-    LeaderboardData = json.decode(stringLeaderboardData)
-else
     LeaderboardData = {}
     LeaderboardData.Races = {}
 end
 
+Citizen.CreateThread(function()
+    if sqlEnabled == true then
+        MySQL.query.await(' CREATE TABLE IF NOT EXISTS aracing_races (`NAME` CHAR(30) NOT NULL, `DATA` LONGTEXT, PRIMARY KEY(`NAME`)) ', {})
+        MySQL.query.await(' CREATE TABLE IF NOT EXISTS aracing_leaderboards (`NAME` CHAR(30) NOT NULL, `DATA` LONGTEXT, PRIMARY KEY(`NAME`)) ', {})
+
+        if Config.migrate_nonsql_data == true then
+            local stringData = GetResourceKvpString('data');
+            if stringData ~= nil then
+                local serverDataMigrate = json.decode(stringData)
+                for _, race in pairs(serverDataMigrate.Races) do
+                    MySQL.query(' INSERT INTO aracing_races (`NAME`, `DATA`) VALUES (:name, :data) ON DUPLICATE KEY UPDATE data = :data ', {name = race.Name, data = json.encode(race)})
+                end
+
+                print(tostring(#serverDataMigrate.Races) .. ' races migrated')
+            end
+
+            local stringLeaderboardData = GetResourceKvpString('leaderBoardData');
+            if stringLeaderboardData ~= nil then
+                local leaderboardDataMigrate = json.decode(stringLeaderboardData)
+                for key, race in pairs(leaderboardDataMigrate.Races) do
+                    MySQL.query(' INSERT INTO aracing_leaderboards (`NAME`, `DATA`) VALUES (:name, :data) ON DUPLICATE KEY UPDATE data = :data ', {name = key, data = json.encode(race)})
+                end
+            end
+
+            print('!!! A-racing storage migration to sql finished. Please disable the migration parameter in config now!')
+        end
+
+        MySQL.query(' SELECT `NAME`, `DATA` FROM aracing_races ', {}, function(result)
+            if result then
+                for _, row in pairs(result) do
+                    if row.NAME ~= nil then
+                        local temp = json.decode(row.DATA)
+                        table.insert(ServerData.Races, temp)
+                    end
+                end
+            end
+        end)
+
+        MySQL.query(' SELECT `NAME`, `DATA` FROM aracing_leaderboards ', {}, function(result)
+            if result then
+                for _, row in pairs(result) do
+                    if row.NAME ~= nil then
+                        local temp = json.decode(row.DATA)
+                        LeaderboardData.Races[row.NAME] = json.decode(row.DATA)
+                    end
+                end
+            end
+        end)
+    end
+end)
 
 Citizen.CreateThread(function()
     local i = 0
-    while true do
+    while sqlEnabled == false do
         Citizen.Wait(1000)
         i = i + 1
 
@@ -156,7 +215,9 @@ function GetLeaderboardPosition(raceName, raceType, record)
             indexCar = -1
         end
     end
-    
+    if sqlEnabled == true then
+        MySQL.query(' INSERT INTO aracing_leaderboards (`NAME`, `DATA`) VALUES (:name, :data) ON DUPLICATE KEY UPDATE data = :data ', {name = raceName, data = json.encode(LeaderboardData.Races[raceName])})
+    end
     LeaderboardLocked = false
 
     return { Overall = indexOverall, Car = indexCar}
@@ -170,7 +231,7 @@ function RemoveVehicleHashFromLeaderboards(hash)
     local stringHash = tostring(hash)
     print(stringHash)
     LeaderboardLocked = true
-    for _,race in pairs(LeaderboardData.Races) do
+    for key,race in pairs(LeaderboardData.Races) do
         if race[stringHash] ~= nil then
             race[stringHash] = nil
         end
@@ -181,6 +242,10 @@ function RemoveVehicleHashFromLeaderboards(hash)
                     table.remove(race[ALLCAR], j)
                 end
             end
+        end
+
+        if sqlEnabled == true then
+            MySQL.query(' INSERT INTO aracing_leaderboards (`NAME`, `DATA`) VALUES (:name, :data) ON DUPLICATE KEY UPDATE data = :data ', {name = key, data = json.encode(race)}) --celkem zabijak, ale je to admin funkce :D
         end
     end
     LeaderboardLocked = false
@@ -202,6 +267,9 @@ function DeleteLeaderboards(raceName)
 
     LeaderboardLocked = true
     LeaderboardData.Races[raceName] = nil
+    if sqlEnabled == true then
+        MySQL.query(' DELETE FROM aracing_leaderboards WHERE name = :name ', {name = raceName})
+    end
     LeaderboardLocked = false
 end
 
@@ -276,12 +344,18 @@ end
 
 function AddRace(race)
     table.insert(ServerData.Races, race)
+    if sqlEnabled == true then
+        MySQL.query(' INSERT INTO aracing_races (`NAME`, `DATA`) VALUES (:name, :data) ON DUPLICATE KEY UPDATE data = :data ', {name = race.Name, data = json.encode(race)})
+    end
 end
 
 function DeleteRace(raceToDelete)
     for index, race in pairs(ServerData.Races) do
         if race.Name == raceToDelete.Name then
             table.remove(ServerData.Races, index)
+            if sqlEnabled == true then
+                MySQL.query(' DELETE FROM aracing_races WHERE name = :name ', {name = race.Name})
+            end
             break
         end
     end
@@ -291,6 +365,9 @@ function SetRaceVerified(raceName, verified)
     for index, race in pairs(ServerData.Races) do
         if race.Name == raceName then
             race.IsVerified = verified
+            if sqlEnabled == true then
+                MySQL.query(' INSERT INTO aracing_races (`NAME`, `DATA`) VALUES (:name, :data) ON DUPLICATE KEY UPDATE data = :data ', {name = race.Name, data = json.encode(race)})
+            end
             return true
         end
     end
@@ -302,6 +379,9 @@ function SetRaceUnlisted(raceName, isUnlisted)
     for index, race in pairs(ServerData.Races) do
         if race.Name == raceName then
             race.IsUnlisted = isUnlisted
+            if sqlEnabled == true then
+                MySQL.query(' INSERT INTO aracing_races (`NAME`, `DATA`) VALUES (:name, :data) ON DUPLICATE KEY UPDATE data = :data ', {name = race.Name, data = json.encode(race)})
+            end
             return true
         end
     end
@@ -320,11 +400,19 @@ function RenameRace(oldName, newName)
     for index, race in pairs(ServerData.Races) do
         if race.Name == oldName then
             race.Name = newName
+            if sqlEnabled == true then
+                MySQL.query(' INSERT INTO aracing_races (`NAME`, `DATA`) VALUES (:name, :data) ON DUPLICATE KEY UPDATE data = :data ', {name = race.Name, data = json.encode(race)})
+                MySQL.query(' DELETE FROM aracing_races WHERE name = :name ', {name = oldName})
+            end
             break
         end
     end
 
     if LeaderboardData.Races[oldName] ~= nil then
+        if sqlEnabled == true then
+            MySQL.query(' INSERT INTO aracing_leaderboards (`NAME`, `DATA`) VALUES (:name, :data) ON DUPLICATE KEY UPDATE data = :data ', {name = newName, data = json.encode(LeaderboardData.Races[oldName])})
+            MySQL.query(' DELETE FROM aracing_leaderboards WHERE name = :name ', {name = oldName})
+        end
         LeaderboardData.Races[newName] = LeaderboardData.Races[oldName]
         LeaderboardData.Races[oldName] = nil
     end
@@ -338,8 +426,10 @@ AddEventHandler('onResourceStop', function(resourceName)
       return
     end
 
-    SetResourceKvp('data', json.encode(ServerData))
-    SetResourceKvp('leaderBoardData', json.encode(LeaderboardData))
+    if sqlEnabled == false then
+        SetResourceKvp('data', json.encode(ServerData))
+        SetResourceKvp('leaderBoardData', json.encode(LeaderboardData))
+    end
 end)
   
 

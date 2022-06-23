@@ -12,6 +12,7 @@ client_scripts {
     "client.lua"
 }
 server_scripts {
+    "@oxmysql/lib/MySQL.lua",
     "admin_secret.lua",
     "constants.lua",
     "config.lua",

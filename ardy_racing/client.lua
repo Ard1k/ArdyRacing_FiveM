@@ -982,7 +982,7 @@ function OpenMenu()
                     Buttons = {
                         {Name = 'Back', Icon = 'back3_w256', IsBack = true},
                         {Name = ' ', IsUnselectable = true},
-                        {Name = 'Version', NameRight = '1.2b' },
+                        {Name = 'Version', NameRight = '1.3' },
                         {Name = 'Author', NameRight = 'Ardy'}
                     }
                 }},

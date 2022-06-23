@@ -3,6 +3,8 @@ Config = {
     enable_teleport_to_race_start = true,
     enable_drift_tire_manipultion = true,
     enable_car_specific_leaderboard_notif = false,
+    use_sql = true,
+    migrate_nonsql_data = false, --!!! When true migrates data from old kvp storage to SQL. To migrate, set to true, ensure resource and then disable. Otherwise migration will be run always on startup and new data could be overwritten.
 
     drift_angle_min = 8,
     drift_angle_max = 35,

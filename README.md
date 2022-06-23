@@ -4,6 +4,9 @@ I wrote this script mainly to race with my friends on our local server (I hate G
 
 https://www.youtube.com/watch?v=6OyVY8LlxpA
 
+Update v1.3
+- added SQL support (oxmysql)
+
 Features:
 - Make your own race templates
   - Multiple race types: Sprint/Circuit/Drift sprint/Drift circuit
@@ -37,4 +40,5 @@ Features:
   - Reset car model from leaderboards - useful when handling of a car is modified all records set by the car can be reset
 - No SQL server needed
   - I wrote the script with SQL conversion in mind (server_interfacing.lua), but for now all data is stored on server serialized to KVP strings
+  - Update 1.3 SQL support is now implemented for oxmysql. To keep using old kvp storage method please change in config "use_sql" to false
         

@@ -99,6 +99,11 @@ AddEventHandler("ardy_racing:SaveRace", function(race)
         return
     end
 
+    if #race.Name > 30 then
+        NotifyPlayerError_server(src, 'Maximum name lenght is 30')
+        return
+    end
+
     for _, checkpoint in pairs(race.Checkpoints) do
         checkpoint.blip = nil
         checkpoint.coords = {x = checkpoint.coords.x, y = checkpoint.coords.y, z = checkpoint.coords.z}
